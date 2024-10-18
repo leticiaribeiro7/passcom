@@ -1,0 +1,51 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator db {
+  provider  = "prisma-client-py"
+  interface = "sync"
+}
+
+model Trecho {
+  id Int @id @default(autoincrement())
+  origem String
+  destino String
+  assentos Assento[]
+  trechosReservados TrechoReservado[]
+}
+
+model Assento {
+  id Int @id @default(autoincrement())
+  numero Int
+  trecho    Trecho    @relation(fields: [id_trecho], references: [id])
+  id_trecho Int
+  trechoReservados TrechoReservado[]
+}
+
+model TrechoReservado {
+  id Int @id @default(autoincrement())
+  passagem   Passagem @relation(fields: [uuid_passagem], references: [uuid])
+  uuid_passagem String
+  trecho     Trecho  @relation(fields: [id_trecho], references: [id])
+  id_trecho  Int
+  assento    Assento @relation(fields: [id_assento], references: [id])
+  id_assento Int
+}
+
+model Passagem {
+  uuid      String  @id @default(uuid())
+  user      User    @relation(fields: [user_id], references: [id])
+  user_id   Int
+  created_at DateTime @default(now())
+  trechosReservados TrechoReservado[]
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  login    String   @unique
+  password String
+  name     String
+  passagens Passagem[]
+}

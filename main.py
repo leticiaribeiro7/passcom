@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from prisma import Prisma, register
 
 db = Prisma()
@@ -7,9 +7,15 @@ register(db)
 
 app = Flask(__name__)
 
-@app.route("/teste")
-def hello_world():
-    return "<p>Hello, World!</p>"
+# teste criando um trecho
+db.trecho.create(data={'origem': 'SSA', 'destino': 'SP'})
+
+@app.route("/trechos")
+def get_trechos():
+  trechos = db.trecho.find_many()
+  return {
+      "data": [trecho.dict() for trecho in trechos]
+  }
 
 
 if __name__ == "__main__":

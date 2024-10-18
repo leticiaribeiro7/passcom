@@ -1,0 +1,71 @@
+version: '3.8'
+services:
+  company_a:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: "postgresql://user:password@db_a:5432/company_a"
+      OTHER_COMPANIES: "http://company_b:5001,http://company_c:5002"
+      COMPANY_NAME: "Company A"
+    depends_on:
+      - db_a
+    networks:
+      - company_network
+
+  company_b:
+    build: .
+    ports:
+      - "5001:5000"
+    environment:
+      DATABASE_URL: "postgresql://user:password@db_b:5432/company_b"
+      OTHER_COMPANIES: "http://company_a:5000,http://company_c:5002"
+      COMPANY_NAME: "Company B"
+    depends_on:
+      - db_b
+    networks:
+      - company_network
+
+  company_c:
+    build: .
+    ports:
+      - "5002:5000"
+    environment:
+      DATABASE_URL: "postgresql://user:password@db_c:5432/company_c"
+      OTHER_COMPANIES: "http://company_a:5000,http://company_b:5001"
+      COMPANY_NAME: "Company C"
+    depends_on:
+      - db_c
+    networks:
+      - company_network
+
+  db_a:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: company_a
+    networks:
+      - company_network
+
+  db_b:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: company_b
+    networks:
+      - company_network
+
+  db_c:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: company_c
+    networks:
+      - company_network
+
+networks:
+  company_network:
+    driver: bridge

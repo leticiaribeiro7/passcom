@@ -26,7 +26,7 @@ DB tables:
 
 <!-- cria um a cada reserva completa - forma uma passagem -->
 - passagem
-    - id
+    - uuid
     - user_id - foreign
     - created_at    TIMESTAMP
 
@@ -38,4 +38,6 @@ DB tables:
     - assento_id
 
 
-<!-- flask --app main run     -->
+<!-- flask --app main --debug run     -->
+<!-- export DATABASEURL=file:company_a -->
+<!-- prisma migrate dev -->
