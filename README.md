@@ -39,5 +39,11 @@ DB tables:
 
 
 <!-- flask --app main --debug run     -->
-<!-- export DATABASEURL=file:company_a -->
 <!-- prisma migrate dev -->
+
+
+<!-- docker compose up --build -->
+
+<!-- A sua implementação apresenta características de topologia de malha parcial, já que permite que qualquer servidor busque dados de outros servidores. Contudo, a agregação de dados em um único ponto (endpoint /all-trechos) pode ser vista como uma característica de topologia de estrela. -->
+
+

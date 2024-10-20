@@ -6,7 +6,7 @@ services:
       - "5000:5000"
     environment:
       DATABASE_URL: "postgresql://user:password@db_a:5432/company_a"
-      OTHER_COMPANIES: "http://company_b:5001,http://company_c:5002"
+      CURRENT_SERVER: "http://company_a:5000"
       COMPANY_NAME: "Company A"
     depends_on:
       - db_a
@@ -19,7 +19,7 @@ services:
       - "5001:5000"
     environment:
       DATABASE_URL: "postgresql://user:password@db_b:5432/company_b"
-      OTHER_COMPANIES: "http://company_a:5000,http://company_c:5002"
+      CURRENT_SERVER: "http://company_b:5000"
       COMPANY_NAME: "Company B"
     depends_on:
       - db_b
@@ -32,7 +32,7 @@ services:
       - "5002:5000"
     environment:
       DATABASE_URL: "postgresql://user:password@db_c:5432/company_c"
-      OTHER_COMPANIES: "http://company_a:5000,http://company_b:5001"
+      CURRENT_SERVER: "http://company_c:5000"
       COMPANY_NAME: "Company C"
     depends_on:
       - db_c
