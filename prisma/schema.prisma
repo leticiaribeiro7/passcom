@@ -10,8 +10,9 @@ generator db {
 
 model Trecho {
   id Int @id @default(autoincrement())
-  origem String
+  origem  String
   destino String
+  company String //a, b, c
   assentos Assento[]
   trechosReservados TrechoReservado[]
 }
@@ -26,7 +27,7 @@ model Assento {
 
 model TrechoReservado {
   id Int @id @default(autoincrement())
-  passagem   Passagem @relation(fields: [uuid_passagem], references: [uuid])
+  passagem   Passagem @relation(fields: [uuid_passagem], references: [uuid], onDelete: Cascade)
   uuid_passagem String
   trecho     Trecho  @relation(fields: [id_trecho], references: [id])
   id_trecho  Int
