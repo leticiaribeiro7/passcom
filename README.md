@@ -54,17 +54,17 @@ DB tables:
         {
             "id_trecho": 1,
             "id_assento": 45,
-            "service": "company1"
+            "company": "a"
         },
         {
             "id_trecho": 2,
             "id_assento": 34,
-            "service": "company2"
+            "company": "b"
         },
         {
             "id_trecho": 3,
             "id_assento": 56,
-            "service": "company3"
+            "company": "c"
         }
     ]
 } -->

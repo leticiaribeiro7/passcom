@@ -18,14 +18,39 @@ urls = [
 
 
 
-
-
 # Endpoint para obter trechos deste servidor
 @app.route("/trechos", methods=["GET"])
 def get_trechos():
     trechos = db.trecho.find_many()
     return jsonify({
         "data": [trecho.dict() for trecho in trechos]
+    })
+# atualiza assento pra disponivel ou não quando reservar/cancelar atraves do id do assento
+@app.route("/assentos/<int:id>", methods=["PUT", "GET"])
+def put_assentos(id):
+    if request.method == "PUT":
+        data = json.loads(request.data)
+        db.assento.update(
+            where={
+                "id_assento": id
+            },
+            data={"disponivel": data.get('disponivel')}
+        )
+        return jsonify({"message": "Assento atualizado"})
+    
+    elif request.method == "GET":
+        assento = db.assento.find_unique(where={"id": id})
+
+        return jsonify({
+            "data": assento.dict()
+        })
+
+#busca assentos relacionados ao trecho
+@app.route("/trechos/<int:id_trecho>/assentos", methods=["GET"])
+def get_assentos(id_trecho):
+    assentos = db.assento.find_many(where={"id_trecho": id_trecho})
+    return jsonify({
+        "data": [assento.dict() for assento in assentos]
     })
 
 # Função para obter trechos de outros servidores
@@ -44,7 +69,7 @@ def get_trechos_from_other_servers():
     return all_trechos
 
 # reserva um trecho 
-@app.route("/reservar-trecho", methods=["POST"])
+@app.route("/trecho-reservado", methods=["POST"])
 def post_trecho():    
     data = json.loads(request.data)
     db.trechoreservado.create({
@@ -55,41 +80,90 @@ def post_trecho():
 
     return jsonify({"message": "Trecho reservado"}), 200
 
+@app.route("/trechos-reservados/<uuid_passagem>", methods=["DELETE"])
+def delete_trecho(uuid_passagem):
+    try:
+        deleted_trechos = db.trechoreservado.delete_many(
+            where = {
+                "uuid_passagem": uuid_passagem
+            }
+        )
+
+        if deleted_trechos['count'] == 0:
+            return jsonify({"message": "Nenhum trecho encontrado para cancelar"}), 404
+        
+        return jsonify({"message": "Trecho cancelado com sucesso"}), 200
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 # cria uma passagem, recebe userid e uuid (id unico passagem)
 @app.route("/passagem", methods=["POST"])
 def post_passagem():
-    data = json.loads(request.data)
-    db.passagem.create({
-        "user_id": data.get('user_id'),
-        "uuid": data.get('uuid')
+        data = json.loads(request.data)
+        db.passagem.create({
+            "user_id": data.get('user_id'),
+            "uuid": data.get('uuid')
+        })
+
+        return jsonify({"message": "Passagem criada com sucesso"}), 200
+
+@app.route("/passagem/uuid/<uuid>", methods=["GET"])
+def get_passagem_uuid():
+    passagem = db.passagem.find_first(where={"uuid": uuid})
+    return jsonify({
+        "data": passagem.dict()
     })
 
-    return jsonify({"message": "Passagem criada com sucesso"}), 200
 
 # busca tds as passagens do user - /passagem/1
-@app.route("/passagem/<user_id>", methods=["GET"])
-def get_passagem(user_id):
+@app.route("/passagem/user/<int:user_id>", methods=["GET"])
+def get_passagem_user(user_id):
     passagens = db.passagem.find_many(where={"user_id": int(user_id)})
     return jsonify({"data": [passagem.dict() for passagem in passagens]}), 200
 
 
-@app.route("/passagem/<user_id>/<uuid>", methods=["DELETE"])
+
+# deleta passagem em tds os servers
+@app.route("/passagem-all/<int:user_id>/<uuid>", methods=["DELETE"])
 def delete_passagem(user_id, uuid):
     try:
-        deleted_passagem = db.passagem.delete(
-            where = {
-                "user_id": int(user_id),
-                "uuid": uuid
-            }
+        # pega a passagem com os trechos associados
+        passagem = db.passagem.find_unique(
+            where={"uuid": uuid},
+            include={"trechosreservados": True}  # Inclui os trechos reservados associados à passagem
         )
 
-        if deleted_passagem['count'] == 0:
+        if not passagem:
             return jsonify({"message": "Nenhuma passagem encontrada para deletar"}), 404
+
+        # Envia a requisição de cancelamento para os trechos correspondentes nas companhias corretas
+        for trecho in passagem.trechos_reservados:
+
+            try:
+                requests.delete(f"http://company_{trecho['company']}:5000/trechos-reservados/{uuid}")
+            except Exception as e:
+                print(f"Erro ao cancelar trecho na companhia {trecho['company']}: {e}")
+
         
+        for url in urls:
+            request.delete(f"{url}/passagem/{user_id}/{uuid}")
+
+
         return jsonify({"message": "Passagem deletada com sucesso"}), 200
-    
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@app.route("/passagem/<int:user_id>/<uuid>", methods=["DELETE"])
+def delete_pass(user_id, uuid):
+    db.passagem.delete(
+    where= {
+        "user_id": int(user_id),
+        "uuid": uuid
+    }
+)
 
 
 @app.route("/user", methods=["POST"])
@@ -99,10 +173,10 @@ def create_user():
         db.user.create({
             "login": data.get('login'),
             "password": data.get('password'),
-            "name": data.get('name')
         })
     except Exception as e:
         return jsonify({"error": "Erro ao criar usuário"}), 500
+
 
 @app.route("/create-user-all", methods=["POST"])
 def create_users_all_servers():
@@ -113,8 +187,8 @@ def create_users_all_servers():
             response = requests.post(f'{url}/user', json={
                 "login": data.get('login'),
                 "password": data.get('password'),
-                "name": data.get('name')}
-            )
+            })
+            
             return jsonify({
                 "message": "Usuário criado com sucesso"
             })
@@ -143,6 +217,15 @@ def reservar_assento():
     data = json.loads(request.data) # lista
 
     uuid_passagem = str(uuid.uuid4())
+    #verifica se o assento escolhido ta disponivel em tds os trechos
+    for trecho in data.get('trechos', []):
+        response = requests.get(f'http://company_{trecho.get('company')}:5000/assentos/{trecho.get('id_assento')}')
+        assento = response.json().get('data')
+        if assento.get('disponivel') == 0:
+            return jsonify({"message": "Assento escolhido não está disponível"})
+                
+                
+
     # cria a mesma passagem em todos os servers
     for url in urls:
         try:
@@ -150,7 +233,9 @@ def reservar_assento():
             print(response.status_code)
         except Exception as e:
             return jsonify({"error": "Erro ao reservar"}), 500
-            
+        
+    disponivel = 0  
+
     for trecho in data.get('trechos', []):
         
         dados = {
@@ -158,8 +243,10 @@ def reservar_assento():
             "id_assento": int(trecho.get('id_assento')),
             "uuid_passagem": uuid_passagem
         }
-        # cria os trechos reservados na companhia que pertence
-        requests.post(f'http://company_{trecho.get('company')}:5000/reservar-trecho', json=dados)
+
+        # cria os trechos reservados na companhia que pertence e bloqueia o assento
+        requests.post(f'http://company_{trecho.get('company')}:5000/trecho-reservado', json=dados)
+        requests.put(f'http://company_{trecho.get('company')}:5000/assentos/{dados['id_assento']}', json={"disponivel": disponivel})
 
     return jsonify({
         "message": "Reserva efetuada com sucesso"

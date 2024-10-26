@@ -6,7 +6,7 @@ services:
     environment:
       DATABASE_URL: "postgresql://user:password@db_a:5432/company_a"
       CURRENT_SERVER: "http://company_a:5000"
-      COMPANY_NAME: "Company A"
+      COMPANY_NAME: "a"
     depends_on:
       - db_a
     networks:
@@ -19,7 +19,7 @@ services:
     environment:
       DATABASE_URL: "postgresql://user:password@db_b:5432/company_b"
       CURRENT_SERVER: "http://company_b:5000"
-      COMPANY_NAME: "Company B"
+      COMPANY_NAME: "b"
     depends_on:
       - db_b
     networks:
@@ -32,7 +32,7 @@ services:
     environment:
       DATABASE_URL: "postgresql://user:password@db_c:5432/company_c"
       CURRENT_SERVER: "http://company_c:5000"
-      COMPANY_NAME: "Company C"
+      COMPANY_NAME: "c"
     depends_on:
       - db_c
     networks:
@@ -44,6 +44,8 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: company_a
+    ports:
+      - "5432:5432"
     networks:
       - company_network
 
@@ -53,6 +55,8 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: company_b
+    ports:
+      - "5433:5432"
     networks:
       - company_network
 
@@ -62,6 +66,8 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: company_c
+    ports:
+      - "5434:5432"
     networks:
       - company_network
 

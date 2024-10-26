@@ -22,6 +22,7 @@ model Assento {
   numero Int
   trecho    Trecho    @relation(fields: [id_trecho], references: [id])
   id_trecho Int
+  disponivel Int
   trechoReservados TrechoReservado[]
 }
 
@@ -47,6 +48,5 @@ model User {
   id       Int      @id @default(autoincrement())
   login    String   @unique
   password String
-  name     String
   passagens Passagem[]
 }

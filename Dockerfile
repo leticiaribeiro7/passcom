@@ -13,7 +13,7 @@ RUN pip install --upgrade -r requirements.txt
 # Copiando o restante do código para o container
 COPY . .
 
-COPY prisma/schema.prisma ./prisma/schema.prisma
+COPY prisma ./prisma
 
 # RUN prisma generate
 
