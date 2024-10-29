@@ -50,7 +50,7 @@ def seed(company: str):
             )
             db.assento.create(
                 data={
-                    "numero": i+1,
+                    "numero": i,
                     "id_trecho": trecho_a2.id,
                     "disponivel": 1  # 1 = disponível
                 }

@@ -3,3 +3,4 @@ prisma
 requests==2.28.1
 pydantic-settings
 redis
+Flask-JWT-Extended

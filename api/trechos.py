@@ -1,6 +1,7 @@
 from db_config import db
 from flask import Blueprint, jsonify, request
 import requests
+from flask_jwt_extended import jwt_required
 
 trechos_bp = Blueprint("trechos", __name__)
 
@@ -35,8 +36,8 @@ def get_trechos_from_other_servers():
     
     return all_trechos
 
-
 @trechos_bp.route("/all-trechos", methods=["GET"])
+@jwt_required()
 def get_all_trechos():
     all_trechos = []
     

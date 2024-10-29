@@ -50,7 +50,7 @@ def delete_passagem(user_id, uuid):
         # pega a passagem com os trechos associados
         passagem = db.passagem.find_unique(
             where={"uuid": uuid},
-            include={"trechosreservados": True}  # Inclui os trechos reservados associados à passagem
+            include={"trechosreservados": True} 
         )
 
         if not passagem:
@@ -61,6 +61,7 @@ def delete_passagem(user_id, uuid):
 
             try:
                 requests.delete(f"http://company_{trecho['company']}:5000/trechos-reservados/{uuid}")
+                requests.put(f"http://company_{trecho['company']}:5000/assentos/{trecho['id']}", json={"disponivel": 1})
             except Exception as e:
                 print(f"Erro ao cancelar trecho na companhia {trecho['company']}: {e}")
 

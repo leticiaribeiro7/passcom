@@ -11,9 +11,13 @@ from api.trechos import trechos_bp
 from api.users import users_bp
 from api.trechos_reservados import trechos_reservados_bp
 
+from flask_jwt_extended import JWTManager
+
 
 app = Flask(__name__)
 
+app.config['JWT_SECRET_KEY'] = 'chave-aqui'
+jwt = JWTManager(app)
 
 db.connect()
 app.register_blueprint(assentos_bp)
