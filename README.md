@@ -49,22 +49,25 @@ DB tables:
 
 <!-- formato req /reservar
 {
-    "user_id": 123,
+    "user_uuid": "uuid1",
     "trechos": [
         {
             "id_trecho": 1,
-            "id_assento": 45,
+            "id_assento": 1,
             "company": "a"
         },
         {
             "id_trecho": 2,
-            "id_assento": 34,
+            "id_assento": 1,
             "company": "b"
         },
         {
-            "id_trecho": 3,
-            "id_assento": 56,
+            "id_trecho": 1,
+            "id_assento": 1,
             "company": "c"
         }
     ]
-} -->
+}
+
+
+-- migration sobe sem fazer alteraçao, faz a alteração, roda manual fora do docker, derruba tudo e sobe dnv

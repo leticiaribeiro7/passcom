@@ -7,7 +7,7 @@ services:
       DATABASE_URL: "postgresql://user:password@db_a:5432/company_a"
       CURRENT_SERVER: "http://company_a:5000"
       COMPANY_NAME: "a"
-      REDIS_HOST: "redis"
+      REDIS_HOST: redis
     depends_on:
       - db_a
       - redis
@@ -22,7 +22,7 @@ services:
       DATABASE_URL: "postgresql://user:password@db_b:5432/company_b"
       CURRENT_SERVER: "http://company_b:5000"
       COMPANY_NAME: "b"
-      REDIS_HOST: "redis"
+      REDIS_HOST: redis
     depends_on:
       - db_b
       - redis
@@ -37,7 +37,7 @@ services:
       DATABASE_URL: "postgresql://user:password@db_c:5432/company_c"
       CURRENT_SERVER: "http://company_c:5000"
       COMPANY_NAME: "c"
-      REDIS_HOST: "redis"
+      REDIS_HOST: redis
     depends_on:
       - db_c
       - redis

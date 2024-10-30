@@ -20,7 +20,7 @@ def put_assentos(id):
         data = json.loads(request.data)
         db.assento.update(
             where={
-                "id_assento": id
+                "id": id
             },
             data={"disponivel": data.get('disponivel')}
         )

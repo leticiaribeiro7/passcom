@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request
 import requests
 import json
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required
+import uuid
 
 users_bp = Blueprint("users", __name__)
 
@@ -36,9 +37,11 @@ def login():
 def register():
     try:
         data = json.loads(request.data)
+
         db.user.create({
             "login": data.get('login'),
             "password": data.get('password'),
+            "uuid": data.get('uuid')
         })
     except Exception as e:
         return jsonify({"error": "Erro ao criar usuário"}), 500
@@ -46,10 +49,13 @@ def register():
 @users_bp.route("/create-user-all", methods=["POST"])
 def create_users_all_servers():
     data = json.loads(request.data)
+    uuid_user = str(uuid.uuid4())
+    
     # cria mesmo user em todos os servers
     for url in urls:
         try:
             response = requests.post(f'{url}/register', json={
+                "uuid": uuid_user,
                 "login": data.get('login'),
                 "password": data.get('password'),
             })
