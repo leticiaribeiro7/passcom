@@ -46,7 +46,7 @@ def register():
     except Exception as e:
         return jsonify({"error": "Erro ao criar usuário"}), 500
 
-@users_bp.route("/create-user-all", methods=["POST"])
+@users_bp.route("/register-all", methods=["POST"])
 def create_users_all_servers():
     data = json.loads(request.data)
     uuid_user = str(uuid.uuid4())

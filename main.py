@@ -16,8 +16,8 @@ from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
 
-
-app.config['JWT_SECRET_KEY'] = 'chave-aqui'
+secret_key = str(uuid.uuid4())
+app.config['JWT_SECRET_KEY'] = secret_key
 jwt = JWTManager(app)
 
 db.connect()

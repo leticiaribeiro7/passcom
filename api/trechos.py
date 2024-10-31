@@ -15,10 +15,27 @@ urls = [
 
 @trechos_bp.route("/trechos", methods=["GET"])
 def get_trechos():
-    trechos = db.trecho.find_many()
-    return jsonify({
-        "data": [trecho.dict() for trecho in trechos]
-    })
+    trechos = db.trecho.find_many(include={"assentos": True})
+    data = [
+        {
+            "company": trecho.company,
+            "origem": trecho.origem,
+            "destino": trecho.destino,
+            "id": trecho.id,
+            "trechosReservados": trecho.trechosReservados,
+            "assentos": [
+                {
+                    "id": assento.id,
+                    "numero": assento.numero,
+                    "disponivel": assento.disponivel
+                }
+                for assento in trecho.assentos
+            ]
+        }
+        for trecho in trechos
+    ]
+
+    return jsonify(data)
 
 
 # Função para obter trechos de outros servidores
@@ -29,7 +46,7 @@ def get_trechos_from_other_servers():
         try:
             response = requests.get(f'{url}/trechos')
             if response.status_code == 200:
-                trechos = response.json().get('data', [])
+                trechos = response.json()
                 all_trechos.extend(trechos)
         except Exception as e:
             print(f"Erro ao acessar {url}: {e}")
@@ -42,7 +59,7 @@ def get_all_trechos():
     all_trechos = []
     
     # Adiciona os trechos de todos os servidores
-    all_trechos.extend(get_trechos_from_other_servers())
+    all_trechos = get_trechos_from_other_servers()
     
     return jsonify({
         "data": all_trechos
