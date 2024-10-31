@@ -18,18 +18,17 @@ def get_trechos():
     trechos = db.trecho.find_many(include={"assentos": True})
     data = [
         {
+            "id": trecho.id,
             "company": trecho.company,
             "origem": trecho.origem,
             "destino": trecho.destino,
-            "id": trecho.id,
-            "trechosReservados": trecho.trechosReservados,
             "assentos": [
                 {
                     "id": assento.id,
                     "numero": assento.numero,
                     "disponivel": assento.disponivel
                 }
-                for assento in trecho.assentos
+                for assento in trecho.assentos if assento.disponivel == 1
             ]
         }
         for trecho in trechos
@@ -38,8 +37,9 @@ def get_trechos():
     return jsonify(data)
 
 
-# Função para obter trechos de outros servidores
-def get_trechos_from_other_servers():
+@trechos_bp.route("/all-trechos", methods=["GET"])
+@jwt_required()
+def get_all_trechos():
     all_trechos = []
     
     for url in urls:
@@ -50,17 +50,6 @@ def get_trechos_from_other_servers():
                 all_trechos.extend(trechos)
         except Exception as e:
             print(f"Erro ao acessar {url}: {e}")
-    
-    return all_trechos
 
-@trechos_bp.route("/all-trechos", methods=["GET"])
-@jwt_required()
-def get_all_trechos():
-    all_trechos = []
     
-    # Adiciona os trechos de todos os servidores
-    all_trechos = get_trechos_from_other_servers()
-    
-    return jsonify({
-        "data": all_trechos
-    })
+    return jsonify(all_trechos)

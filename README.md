@@ -32,9 +32,8 @@
     Foram implementados dois conjuntos de rotas:
 </p>
 
-**1.  Comunicação entre servidores**
-
-/register - post
+- **Comunicação entre servidores**
+/register post
 /trechos - get
 /trecho-reservado - post
 /trechos-reservados/<uuid_passagem> - delete
@@ -43,13 +42,158 @@
 /passagem/user/<user_uuid> - get
 /passagem/<user_uuid>/<passagem_uuid> - delete
 
-**2.  Comunicação entre clientes e servidores**
-/login
-/register-all
-/all-trechos - get
-/passagem-all/<user_uuid>/<passagem_uuid> - delete
-/passagens-all/<user_uuid> - get
-/reservar - post
+- **Comunicação entre clientes e servidores**
+
+#### 1. Cliente insere login e senha e recebe um token JWT para acessar o servidor atual. Todas as rotas do cliente necessitam do token.
+
+**Requisição**
+```
+POST /login
+Content-Type: application/json
+
+{
+    "login": "username1",
+    "password": "password1"
+}
+```
+**Resposta**
+```
+{
+	"access_token": "eyJhbGciOi...iz9A"
+}
+
+```
+#### 2. Cadastro do cliente no sistema
+
+
+**Requisição**
+
+```
+POST /register-all
+Content-Type: application/json
+
+{
+    "login": "username1",
+    "password": "password1"
+}
+```
+**Resposta**
+```
+{
+    "message": "Usuário criado com sucesso"
+}
+```
+#### 3. Busca trechos em todos os servidores, contém os assentos disponíveis de cada trecho 
+
+**Requisição**
+```
+GET /all-trechos
+Authorization: Bearer Token
+
+```
+**Resposta**
+```
+[
+	{
+		"assentos": [
+			{
+				"disponivel": 1,
+				"id": 3,
+				"numero": 2
+			},
+			{
+				"disponivel": 1,
+				"id": 5,
+				"numero": 3
+			}
+		],
+		"company": "a",
+		"destino": "Cidade B1",
+		"id": 1,
+		"origem": "Cidade A1"
+	}
+]
+```
+#### 3. Cria uma passagem com os trechos e assentos escolhidos em todos os servidores 
+**Requisição**
+```
+POST /reservar
+Content-Type: application/json
+Authorization: Bearer Token
+
+{
+    "user_uuid": "uuid2",
+    "trechos": [
+        {
+            "id_trecho": 1,
+            "id_assento": 9,
+            "company": "a"
+        },
+        {
+            "id_trecho": 2,
+            "id_assento": 9,
+            "company": "b"
+        },
+        {
+            "id_trecho": 1,
+            "id_assento": 9,
+            "company": "c"
+        }
+    ]
+}
+```
+**Resposta**
+```
+{
+    "message": "Reserva efetuada com sucesso"
+}
+```
+
+#### 4. Busca passagens do usuário através do seu UUID (identificador único)
+
+**Requisição**
+```
+GET /passagens-all/<user_uuid>
+Authorization: Bearer Token
+```
+**Resposta**
+```
+[
+	{
+		"created_at": "Wed, 30 Oct 2024 20:22:37 GMT",
+		"trechosReservados": [
+			{
+				"assento": {
+					"disponivel": 1,
+					"numero": 2
+				},
+				"trecho": {
+					"company": "c",
+					"destino": "Cidade D1",
+					"origem": "Cidade C1"
+				}
+			}
+		],
+		"uuid": "uuid-2"
+	}
+]
+```
+
+#### 5. Cancela passagem em todos os servidores através do UUID da passagem e do usuário
+**Requisição**
+```
+DELETE /passagem-all/<user_uuid>/<passagem_uuid>
+Authorization: Bearer Token
+```
+**Resposta**
+```
+{
+    "message": "Passagem deletada com sucesso"
+}
+```
+
+
+
 
 ### Roteamento
 

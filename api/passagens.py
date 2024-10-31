@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request
 import json, requests, os
 import uuid
 import redis
+from flask_jwt_extended import jwt_required
 
 
 passagens_bp = Blueprint("passagens", __name__)
@@ -54,10 +55,34 @@ def get_passagem_user(user_uuid):
                 }
             }
         })
-    return jsonify({"data": [passagem.dict() for passagem in passagens]}), 200
+    
+    passagens_simplificadas = [
+        {
+            "uuid": passagem.uuid,
+            "created_at": passagem.created_at,
+            "trechosReservados": [
+                {
+                    "trecho": {
+                        "origem": trecho_reservado.trecho.origem,
+                        "destino": trecho_reservado.trecho.destino,
+                        "company": trecho_reservado.trecho.company
+                    },
+                    "assento": {
+                        "numero": trecho_reservado.assento.numero,
+                        "disponivel": trecho_reservado.assento.disponivel
+                    }
+                }
+                for trecho_reservado in passagem.trechosReservados
+            ]
+        }
+        for passagem in passagens
+    ]
+
+    return jsonify(passagens_simplificadas), 200
 
 
 @passagens_bp.route("/passagens-all/<user_uuid>", methods=["GET"])
+@jwt_required()
 def get_passagem_all_servers(user_uuid):
     passagens_agrupadas = {}
 
@@ -67,7 +92,7 @@ def get_passagem_all_servers(user_uuid):
             # Solicita todas as passagens do usuário no servidor atual
             response = requests.get(f"{url}/passagem/user/{user_uuid}")
             if response.status_code == 200:
-                passagens_data = response.json().get("data", [])
+                passagens_data = response.json()
 
                 # Agrupa os trechos por UUID de passagem
                 for passagem in passagens_data:
@@ -78,17 +103,19 @@ def get_passagem_all_servers(user_uuid):
                         passagens_agrupadas[uuid_passagem]["trechosReservados"].extend(passagem["trechosReservados"])
                     else:
                         # Caso contrário, cria uma nova entrada para a passagem e seus trechos
-                        passagens_agrupadas[uuid_passagem] = passagem
+                        passagens_agrupadas[uuid_passagem] = {
+                            "uuid": passagem["uuid"],
+                            "created_at": passagem["created_at"],
+                            "trechosReservados": passagem["trechosReservados"]
+                        }
 
         except Exception as e:
-            print(f"Erro ao buscar passagens no servidor {url}: {e}")
+            return jsonify({"error": f"Erro ao buscar passagem no servidor {url}, {e}"}), 500
 
-    # Converte o dicionário de passagens agrupadas em uma lista para resposta
     todas_passagens = list(passagens_agrupadas.values())
     
-    # Retorna a lista consolidada de todas as passagens com seus trechos reservados
     if todas_passagens:
-        return jsonify({"passagens": todas_passagens}), 200
+        return jsonify(todas_passagens), 200
     else:
         return jsonify({"message": "Nenhuma passagem encontrada para o UUID do usuário fornecido"}), 404
 
@@ -100,27 +127,35 @@ def delete_passagem(user_uuid, uuid):
         # pega a passagem com os trechos associados
         passagem = db.passagem.find_unique(
             where={"uuid": uuid},
-            include={"trechosreservados": True} 
-        )
+            include={
+            "trechosReservados": {
+                "include": {
+                    "trecho": True,
+                    "assento": True
+                }
+            }
+        })
 
         if not passagem:
             return jsonify({"message": "Nenhuma passagem encontrada para deletar"}), 404
+        
+        print(passagem)
 
         # Envia a requisição de cancelamento para os trechos correspondentes nas companhias corretas
-        for trecho in passagem.trechos_reservados:
+        for trechoReservado in passagem.trechosReservados:
 
             try:
-                requests.delete(f"http://company_{trecho['company']}:5000/trechos-reservados/{uuid}")
-                requests.put(f"http://company_{trecho['company']}:5000/assentos/{trecho['id']}", json={"disponivel": 1})
+                requests.delete(f"http://company_{trechoReservado.trecho.company}:5000/trechos-reservados/{uuid}")
+                requests.put(f"http://company_{trechoReservado.trecho.company}:5000/assentos/{trechoReservado.assento.id}", json={"disponivel": 1})
             except Exception as e:
-                print(f"Erro ao cancelar trecho na companhia {trecho['company']}: {e}")
+               return jsonify({"error": str(e)}), 500
 
         
         for url in urls:
-            request.delete(f"{url}/passagem/{user_uuid}/{uuid}")
+            response = requests.delete(f"{url}/passagem/{user_uuid}/{uuid}")
 
 
-        return jsonify({"message": "Passagem deletada com sucesso"}), 200
+        return response
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -132,8 +167,9 @@ def delete_pass(user_uuid, uuid):
     where= {
         "user_uuid": user_uuid,
         "uuid": uuid
-    }
-)
+    })
+
+    return jsonify({"message": "Passagem deletada com sucesso"}), 200
 
 
 # aux
@@ -157,10 +193,11 @@ def check_disponibilidade(trecho):
         redis_client.delete(lock_key)  # Libera o lock no caso de erro
         return False, {"message": "Erro ao verificar assento"}, 500
 
-    return True, lock_key
+    return True, lock_key, 200
     
 # cria uma reserva, recebe userid e lista de trechos
 @passagens_bp.route("/reservar", methods=["POST"])
+@jwt_required()
 def reservar_assento():
     data = json.loads(request.data)
     uuid_passagem = str(uuid.uuid4())
@@ -168,13 +205,13 @@ def reservar_assento():
 
     # verifica disponibilidade e bloqueia todos os assentos
     for trecho in data.get('trechos', []):
-        success, result = check_disponibilidade(trecho)
+        success, result, status_code = check_disponibilidade(trecho)
 
         if not success:
             # Se o assento do trecho não estiver disponível, libera locks
             for key in locked_keys:
                 redis_client.delete(key)
-            return jsonify(result), result[1]  # Retorna mensagem de erro e codigo de erro
+            return jsonify(result), status_code  # Retorna mensagem de erro e codigo de erro
 
         locked_keys.append(result)
 
