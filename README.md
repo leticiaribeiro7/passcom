@@ -201,10 +201,13 @@ Authorization: Bearer Token
 
 ### Concorrência Distribuída
 <p align="justify">
+    A fim de evitar que ocorra acessos simultâneos aos dados compartilhados, foi utilizado o Redis para lock distribuído. Todos os servidores se conectam à mesma instância do Redis, quando um cliente solicita uma reserva e envia a requisição com todos os trechos em uma lista através da API, o Redis cria uma chave única contendo o id do trecho, numero do assento e nome da companhia para cada um dos registros da lista e faz o lock em todos, se outra requisição chegar e tentar o lock com a mesma chave, o Redis nega pois só pode haver chaves únicas.
 </p>
 
 
 <p align="justify">
+ Em seguida, é feita a verificação de disponibilidade de assento em todos os trechos, se por acaso o assento não estiver disponível em algum, o lock é liberado. Caso passe 30 segundos e a reserva não seja feita, o lock também é liberado, evitando deadlocks. Por fim, é também liberado ao criar a reserva com sucesso.
+
 </p>
 
 
@@ -224,8 +227,7 @@ Authorization: Bearer Token
 </p>
 
 <p align="justify">
-    A organização das dependências estão contidas no Dockerfile
-    ;
+    As dependências são instaladas através do Dockerfile e também foi implementado um script para executar ao subir os containers, que são as migrações do Prisma e execução do Flask.
 </p>
 
 ## Conclusão

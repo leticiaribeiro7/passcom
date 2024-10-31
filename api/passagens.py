@@ -28,17 +28,6 @@ def post_passagem():
 
     return jsonify({"message": "Passagem criada com sucesso"}), 200
 
-@passagens_bp.route("/passagem/uuid/<uuid>", methods=["GET"])
-def get_passagem_uuid(uuid):
-    passagem = db.passagem.find_first(
-        where={"uuid": uuid},
-        include={"trechosReservados": True}
-    ) #include trechos
-
-    return jsonify({
-        "data": passagem.dict()
-    })
-
 
 # busca tds as passagens do user (atraves do uuid dele)
 @passagens_bp.route("/passagem/user/<user_uuid>", methods=["GET"])
