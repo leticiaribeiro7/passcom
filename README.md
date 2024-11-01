@@ -12,7 +12,7 @@
 </p>
 
 <p align="justify">
-	No PassCom, cada companhia mantém seu próprio servidor Vendepass centralizado. Os clientes realizam as compras sobre as rotas oferecidas por companhia. Ou seja, um servidor equivale a uma companhia áerea de baixo custo, que possui rotas próprias mas que também armazena informações de outras companhias. Sendo assim, é possível o usuário estar na Companhia A e comprar uma passagem da Companhia B.
+	No PassCom, cada companhia mantém seu próprio servidor Vendepass centralizado. Os clientes realizam as compras sobre as rotas oferecidas por companhia. Os servidores só comunicam entre si para troca de informações.
 </p>
 
 <p align="justify">
