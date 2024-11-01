@@ -22,10 +22,15 @@
 ## Metodologia e Resultados
 
 <p align="justify">
-prisma orm, docker e docker compose, flask, postgresql, react, redis
+O projeto foi criado com uma arquitetura baseada em contêineres, utilizando Docker e Docker Compose para administrar diversos serviços de forma eficaz. A implementação do backend foi feita com Flask, encarregado da API RESTful e da lógica de negócios. O PostgreSQL atuou como um banco de dados relacional, auxiliado pelo Prisma ORM para simplificar operações de consulta e manipulação de dados, além de gerenciar migrações de esquema.
 </p>
+
 <p align="justify">
- 
+Para aprimorar o desempenho, o Redis foi incorporado como um cache distribuído, estabelecendo bloqueios distribuídos. A interface do usuário foi desenvolvida com React, proporcionando uma interface dinâmica e responsiva, interagindo com o backend através da API. É importante ressaltar que a linguagem de programação utilizada foi Python, usando o VSCode como editor de código-fonte. Além disso, o Docker Compose conduziu a integração de todos os serviços, assegurando um ambiente de desenvolvimento estável e de fácil utilização.
+</p>
+
+<p align="justify">
+Ainda nesta seção, além dos recursos usados para a construção do sistema, são descritos os resultados de cada funcionalidade e requisito do PassCom.
 </p>
 
 ### Arquitetura da Solução
@@ -54,7 +59,9 @@ prisma orm, docker e docker compose, flask, postgresql, react, redis
 
 
 ### Roteamento
-
+<p align="justify">
+[A inserir no código]
+</p>
 
 
 ### Concorrência Distribuída
@@ -444,7 +451,6 @@ Authorization: Bearer Token
 
 
 
-### Documentação do Código
 
 ### Emprego do Docker
 <p align="justify">
@@ -458,10 +464,13 @@ Authorization: Bearer Token
 ## Conclusão
 
 <p align="justify">
+	
 </p>
 
 <p align="justify">
+	
 </p>
 
 <p align="justify">
+	
 </p>
