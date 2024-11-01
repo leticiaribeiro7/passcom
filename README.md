@@ -464,13 +464,14 @@ Authorization: Bearer Token
 ## Conclusão
 
 <p align="justify">
-	
+	O PassCom foi criado como um sistema básico de cliente-servidor, utilizando a API REST para estabelecer a comunicação e usando princípios stateless de servidor. Em prol disto, é possível realizar comunicação entre os servidores e clientes e servidores de forma eficaz. A utilização da API REST dá uma melhor performance e aumenta a confiabilidade do sistema, como também possibilita oportunidades de expansão em trabalhos futuros.
 </p>
 
 <p align="justify">
-	
+	O uso de um banco de dados PostgreSQL foi um recurso acrescido durante o desenvolvimento, que possibilitou o armazenamento de informações e consequentemente, uma testagem de concorrência mais fácil. Além disto, a implementação de práticas recomendadas de desenvolvimento, tais como autenticação, correção de erros e documentação da API, auxiliou na segurança do sistema. A aplicação de um sistema de cache com Redis melhorou ainda mais o rendimento, assegurando tempos de resposta ágeis mesmo em situações de alta demanda.
 </p>
 
 <p align="justify">
-	
+	Em síntese, os requisitos e as funcionalidades do sistema PassCom foram atentidos com sucesso, como também os testes de concorrência. A experiência obtida durante o desenvolvimento e execução deste projeto servirá como um guia para futuros projetos, incluindo no âmbhito profissional, uma vez que as tecnologias usadas são bastantes presentes no mercado de trabalho.
 </p>
+
