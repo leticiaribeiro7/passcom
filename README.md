@@ -12,7 +12,7 @@
 </p>
 
 <p align="justify">
-	No PassCom, cada companhia mantém seu próprio servidor Vendepass centralizado. Os clientes realizam as compras sobre as rotas oferecidas por companhia. Os servidores só comunicam entre si para troca de informações.
+	No PassCom, cada companhia mantém seu próprio servidor Vendepass. Os clientes realizam as compras nas rotas oferecidas por cada companhia, e os servidores, que fazem parte de um sistema distribuído, comunicam-se entre si para a troca de informações.
 </p>
 
 <p align="justify">
@@ -299,6 +299,16 @@ Authorization: Bearer Token
 
 
 ### Avaliação da Solução
+<p align="justify">
+	Testes foram realizados para avaliar o comportamento do sistema em caso de falha de um dos servidores. Observou-se que, quando todos os servidores não são estritamente necessários para uma operação, os servidores que permanecem ativos conseguem concluir suas tarefas normalmente, em conformidade com o requisito do sistema de que a falha de um servidor não deve impactar os demais. Portanto, ao tentar reservar uma passagem que inclui trechos de todos os três servidores, a operação não é concluída em nenhum deles, pois a disponibilidade de assento não pode ser verificada em todos os trechos necessários.
+</p>
+<p align="justify">
+	As operações que podem ser concluídas individualmente incluem a visualização de trechos, a visualização de passagens compradas, o registro e o login. No entanto, caso um servidor fique fora do ar, os trechos específicos desse servidor não serão exibidos ao cliente, fazendo com que as informações pareçam incompletas. Esse problema é registrado como um log no terminal, indicando que houve falha em alguns dos servidores.
+</p>
+
+<p align="justify">
+- incluir testes de concorrencia
+</p>
 
 ### Documentação do Código
 
