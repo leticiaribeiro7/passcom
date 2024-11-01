@@ -8,10 +8,15 @@
 ## Introdução
 
 <p align="justify">
-   
+	O sucesso da Vendepass, um sistema de compra de passagens de tráfego aéreo para companhias aéreas de baixo custo (LCCs) chamou a atenção de outras três empresas brasileiras. Visando a otimização de recursos, essas três empresas se uniram para ter uma oferta conjunta de assentos. O PassCom é derivado dessa junção, sendo um sistema de venda compartilhada de passagens aéreas. 
 </p>
 
 <p align="justify">
+	No PassCom, cada companhia mantém seu próprio servidor Vendepass centralizado. Os clientes realizam as compras sobre as rotas oferecidas por companhia. Ou seja, um servidor equivale a uma companhia áerea de baixo custo, que possui rotas próprias mas que também armazena informações de outras companhias. Sendo assim, é possível o usuário estar na Companhia A e comprar uma passagem da Companhia B.
+</p>
+
+<p align="justify">
+	Este relatório descreve os recursos utilizados, bem como seus resultados para a criação do PassCom. As próximas seções detalham passo a passo as funcionalidades do sistema.
 </p>
 
 ## Metodologia e Resultados
