@@ -5,19 +5,10 @@ import json
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 import uuid
 
+from utils import urls, get_user
+
 users_bp = Blueprint("users", __name__)
 
-urls = [
-    "http://company_a:5000",
-    "http://company_b:5000",
-    "http://company_c:5000"
-]
-
-
-
-def get_user(login, password):
-    return db.user.find_first(where={"login": login, "password": password})
-    
 
 
 @users_bp.route('/login', methods=['POST'])
@@ -30,7 +21,7 @@ def login():
         access_token = create_access_token(identity=login)
         return jsonify(access_token=access_token), 200
     else:
-        return jsonify({"msg": "Credenciais inválidas"}), 401
+        return jsonify({"message": "Credenciais inválidas"}), 401
 
 
 @users_bp.route('/register', methods=['POST'])
@@ -49,6 +40,9 @@ def register():
 
 @users_bp.route("/register-all", methods=["POST"])
 def create_users_all_servers():
+    
+    if not request.is_json:
+        return jsonify({"error": "Requisição deve conter um JSON válido"}), 400
     data = json.loads(request.data)
     uuid_user = str(uuid.uuid4())
     responses = []
@@ -61,14 +55,8 @@ def create_users_all_servers():
                 "login": data.get('login'),
                 "password": data.get('password'),
             }, timeout=10)
-        
-            if response.status_code == 200:
-                responses.append(response.json())
 
         except Exception as e:
             print(f'Erro no servidor {url}')
 
-    if responses:
-        return responses
-    else:
-        return {"error": "Falha em todos os servidores"}
+    return response.json()

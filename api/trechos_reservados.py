@@ -28,7 +28,7 @@ def delete_trecho(uuid_passagem):
         if deleted_trechos['count'] == 0:
             return jsonify({"message": "Nenhum trecho encontrado para cancelar"}), 404
         
-        return jsonify({"message": "Trecho cancelado com sucesso"}), 200
+        return jsonify({"message": "Trechos cancelados com sucesso"}), 200
     
     except Exception as e:
         return jsonify({"error": str(e)}), 500

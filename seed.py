@@ -1,11 +1,10 @@
 import os
 from prisma import Prisma
 
-# Inicializando o cliente Prisma
 db = Prisma()
 db.connect()
 
-def seed(company: str):
+def seed(company):
     # Criando usuários compartilhados
     user_shared_1 = db.user.upsert(
         where={"login": "usuario_shared_1"},
@@ -40,88 +39,87 @@ def seed(company: str):
         }
     )
 
-    # Criando trechos específicos para cada companhia
+    # Criando trechos específicos para cada companhia com cidades reais e trechos complementares
     if company == "a":
         # Trechos para Companhia A
-        trecho_a1 = db.trecho.create(
+        trecho_sp_rj = db.trecho.create(
             data={
-                "origem": "Cidade A1",
-                "destino": "Cidade B1",
+                "origem": "São Paulo",
+                "destino": "Rio de Janeiro",
                 "company": "a"
             }
         )
-        trecho_a2 = db.trecho.create(
+        trecho_rj_cwb = db.trecho.create(
             data={
-                "origem": "Cidade A2",
-                "destino": "Cidade B2",
+                "origem": "Rio de Janeiro",
+                "destino": "Curitiba",
                 "company": "a"
             }
         )
         # Assentos para os trechos da Companhia A
         for i in range(1, 6):
-            db.assento.create(data={"numero": i, "id_trecho": trecho_a1.id, "disponivel": 1})
-            db.assento.create(data={"numero": i, "id_trecho": trecho_a2.id, "disponivel": 1})
+            db.assento.create(data={"numero": i, "id_trecho": trecho_sp_rj.id, "disponivel": 1})
+            db.assento.create(data={"numero": i, "id_trecho": trecho_rj_cwb.id, "disponivel": 1})
 
         # Reservando trechos compartilhados em Companhia A
         db.trechoreservado.create(
-            data={"uuid_passagem": passagem_shared_1.uuid, "id_trecho": trecho_a1.id, "id_assento": 1}
+            data={"uuid_passagem": passagem_shared_1.uuid, "id_trecho": trecho_sp_rj.id, "id_assento": 1}
         )
 
     elif company == "b":
         # Trechos para Companhia B
-        trecho_b1 = db.trecho.create(
+        trecho_cwb_po = db.trecho.create(
             data={
-                "origem": "Cidade B1",
-                "destino": "Cidade C1",
+                "origem": "Curitiba",
+                "destino": "Porto Alegre",
                 "company": "b"
             }
         )
-        trecho_b2 = db.trecho.create(
+        trecho_po_florianopolis = db.trecho.create(
             data={
-                "origem": "Cidade B2",
-                "destino": "Cidade C2",
+                "origem": "Porto Alegre",
+                "destino": "Florianópolis",
                 "company": "b"
             }
         )
         # Assentos para os trechos da Companhia B
         for i in range(1, 6):
-            db.assento.create(data={"numero": i, "id_trecho": trecho_b1.id, "disponivel": 1})
-            db.assento.create(data={"numero": i, "id_trecho": trecho_b2.id, "disponivel": 1})
+            db.assento.create(data={"numero": i, "id_trecho": trecho_cwb_po.id, "disponivel": 1})
+            db.assento.create(data={"numero": i, "id_trecho": trecho_po_florianopolis.id, "disponivel": 1})
 
         # Reservando trechos compartilhados em Companhia B
         db.trechoreservado.create(
-            data={"uuid_passagem": passagem_shared_1.uuid, "id_trecho": trecho_b1.id, "id_assento": 2}
+            data={"uuid_passagem": passagem_shared_1.uuid, "id_trecho": trecho_cwb_po.id, "id_assento": 2}
         )
-
 
     elif company == "c":
         # Trechos para Companhia C
-        trecho_c1 = db.trecho.create(
+        trecho_florianopolis_sp = db.trecho.create(
             data={
-                "origem": "Cidade C1",
-                "destino": "Cidade D1",
+                "origem": "Florianópolis",
+                "destino": "São Paulo",
                 "company": "c"
             }
         )
-        trecho_c2 = db.trecho.create(
+        trecho_sp_bh = db.trecho.create(
             data={
-                "origem": "Cidade C2",
-                "destino": "Cidade D2",
+                "origem": "São Paulo",
+                "destino": "Belo Horizonte",
                 "company": "c"
             }
         )
         # Assentos para os trechos da Companhia C
         for i in range(1, 6):
-            db.assento.create(data={"numero": i, "id_trecho": trecho_c1.id, "disponivel": 1})
-            db.assento.create(data={"numero": i, "id_trecho": trecho_c2.id, "disponivel": 1})
+            db.assento.create(data={"numero": i, "id_trecho": trecho_florianopolis_sp.id, "disponivel": 1})
+            db.assento.create(data={"numero": i, "id_trecho": trecho_sp_bh.id, "disponivel": 1})
 
         # Reservando trechos compartilhados em Companhia C
         db.trechoreservado.create(
-            data={"uuid_passagem": passagem_shared_2.uuid, "id_trecho": trecho_c1.id, "id_assento": 3}
+            data={"uuid_passagem": passagem_shared_2.uuid, "id_trecho": trecho_florianopolis_sp.id, "id_assento": 3}
         )
 
     db.disconnect()
 
 if __name__ == "__main__":
-    company_arg = os.getenv("COMPANY_NAME")  # Exemplo: 'a', 'b', ou 'c'
-    seed(company_arg)
+    company = os.getenv("COMPANY_NAME")  # Exemplo: 'a', 'b', ou 'c'
+    seed(company)

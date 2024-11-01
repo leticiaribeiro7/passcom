@@ -1,10 +1,11 @@
 from db_config import db
 from flask import Blueprint, jsonify, request
-import json, requests
+import json
 
 assentos_bp = Blueprint("assentos", __name__)
 
-# atualiza assento pra disponivel ou não quando reservar/cancelar atraves do id do assento
+# Atualiza assento pra disponivel ou não disponível quando reservar ou cancelar passagem
+# Busca o assento pelo id para saber se está disponível
 @assentos_bp.route("/assentos/<int:id>", methods=["PUT", "GET"])
 def put_assentos(id):
     if request.method == "PUT":
@@ -20,8 +21,6 @@ def put_assentos(id):
     elif request.method == "GET":
         assento = db.assento.find_unique(where={"id": id})
 
-        return jsonify({
-            "data": assento.dict()
-        })
+        return assento.dict()
 
 

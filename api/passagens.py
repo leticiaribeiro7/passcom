@@ -5,17 +5,13 @@ import uuid
 import redis
 from flask_jwt_extended import jwt_required
 
+from utils import check_disponibilidade, urls
+
 
 passagens_bp = Blueprint("passagens", __name__)
 
 redis_host = os.getenv("REDIS_HOST")
 redis_client = redis.Redis(host=redis_host, port=6379, db=0)
-
-urls = [
-    "http://company_a:5000",
-    "http://company_b:5000",
-    "http://company_c:5000"
-]
 
 
 @passagens_bp.route("/passagem", methods=["POST"])
@@ -129,9 +125,8 @@ def delete_passagem(user_uuid, uuid):
         if not passagem:
             return jsonify({"message": "Nenhuma passagem encontrada para deletar"}), 404
         
-        print(passagem)
 
-        # Envia a requisição de cancelamento para os trechos correspondentes nas companhias corretas
+        # Deleta os trechos reservados de cada companhia e libera assentos
         for trechoReservado in passagem.trechosReservados:
 
             try:
@@ -161,41 +156,23 @@ def delete_pass(user_uuid, uuid):
 
     return jsonify({"message": "Passagem deletada com sucesso"}), 200
 
-
-# aux
-def check_disponibilidade(trecho):
-    lock_key = f"company_{trecho.get('company')}_trecho_{trecho.get('id_trecho')}_assento_{trecho.get('numero_assento')}"
-    lock_acquired = redis_client.set(lock_key, "locked", nx=True, ex=30)
-
-    if not lock_acquired:
-        return False, {"message": "Outro cliente está reservando este assento, tente novamente"}, 409
-
-    try:
-        # Verifica se o assento ta disponível
-        response = requests.get(f'http://company_{trecho.get("company")}:5000/assentos/{trecho.get("id_assento")}')
-        assento = response.json().get('data')
-
-        if assento.get('disponivel') == 0:
-            redis_client.delete(lock_key)  # Libera o lock se não estiver disponível
-            return False, {"message": "Assento não está disponível"}, 409
-
-    except Exception:
-        redis_client.delete(lock_key)  # Libera o lock no caso de erro
-        return False, {"message": "Erro ao verificar assento"}, 500
-
-    return True, lock_key, 200
     
 # cria uma reserva, recebe userid e lista de trechos
 @passagens_bp.route("/reservar", methods=["POST"])
 @jwt_required()
 def reservar_assento():
+    
+    if not request.is_json:
+        return jsonify({"error": "Requisição deve conter um JSON válido"}), 400
+
+
     data = json.loads(request.data)
     uuid_passagem = str(uuid.uuid4())
     locked_keys = []  # Lista de locks para liberar no final
 
     # verifica disponibilidade e bloqueia todos os assentos
     for trecho in data.get('trechos', []):
-        success, result, status_code = check_disponibilidade(trecho)
+        success, result, status_code = check_disponibilidade(trecho, redis_client)
 
         if not success:
             # Se o assento do trecho não estiver disponível, libera locks

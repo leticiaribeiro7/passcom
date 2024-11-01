@@ -3,14 +3,9 @@ from flask import Blueprint, jsonify, request
 import requests
 from flask_jwt_extended import jwt_required
 
+from utils import urls
+
 trechos_bp = Blueprint("trechos", __name__)
-
-
-urls = [
-    "http://company_a:5000",
-    "http://company_b:5000",
-    "http://company_c:5000"
-]
 
 
 @trechos_bp.route("/trechos", methods=["GET"])

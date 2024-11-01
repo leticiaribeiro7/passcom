@@ -22,7 +22,7 @@
 ## Metodologia e Resultados
 
 <p align="justify">
-
+prisma orm, docker e docker compose, flask, postgresql, react, redis
 </p>
 <p align="justify">
  
@@ -49,10 +49,49 @@
 ### Protocolo de Comunicação
 <p align="justify">
     Toda a comunicação foi feita através de API REST, aceitando e enviando dados em formato JSON e seguindo princípios stateless, em que cada requisição recebe todos os dados necessários para ser processada. Os endpoints são protegidos com autenticação JWT, os usuários precisam estar logados para realizar as operações que são: visualizar trechos, comprar passagem, visualizar passagens e cancelar passagem.
-    Foram implementados dois conjuntos de rotas:
+    Foram implementados dois conjuntos de rotas: comunicação entre servidores e comunicação entre clientes e servidores, a documentação da API está detalhada posteriormente nesse artigo.
 </p>
 
-- **Comunicação entre servidores**
+
+### Roteamento
+
+
+
+### Concorrência Distribuída
+<p align="justify">
+    A fim de evitar que ocorra acessos simultâneos aos dados compartilhados, foi utilizado o Redis para lock distribuído. Todos os servidores se conectam à mesma instância do Redis, quando um cliente solicita uma reserva e envia a requisição com todos os trechos em uma lista através da API, o Redis cria uma chave única contendo o id do trecho, numero do assento e nome da companhia para cada um dos registros da lista e faz o lock em todos, se outra requisição chegar e tentar o lock com a mesma chave, o Redis nega pois só pode haver chaves únicas.
+</p>
+
+
+<p align="justify">
+ Em seguida, é feita a verificação de disponibilidade de assento em todos os trechos, se por acaso o assento não estiver disponível em algum, o lock é liberado. Caso passe 30 segundos e a reserva não seja feita, o lock também é liberado, evitando deadlocks. Por fim, é também liberado ao criar a reserva com sucesso.
+
+</p>
+
+
+### Confiabilidade da Solução
+<p align="justify">
+    Caso os servidores sejam desconectados e conectados novamente, os clientes não poderão continuar a operação que estavamfazendo e deve reiniciá-la ao se reconectar. Do ponto de vista da concorrência, o "lock" adquirido ao se solicitar a compra de uma passagem é liberado após 30 segundos em qualquer situação, para evitar que ocorram deadlocks. Além disso, a API foi desenvolvida seguindo o princípio Stateless, em que o estado do cliente não é armazenado entre requisições.
+</p>
+
+
+### Avaliação da Solução
+<p align="justify">
+	Testes foram realizados para avaliar o comportamento do sistema em caso de falha de um dos servidores. Observou-se que, quando todos os servidores não são estritamente necessários para uma operação, os servidores que permanecem ativos conseguem concluir suas tarefas normalmente, em conformidade com o requisito do sistema de que a falha de um servidor não deve impactar os demais. Portanto, ao tentar reservar uma passagem que inclui trechos de todos os três servidores, a operação não é concluída em nenhum deles, pois a disponibilidade de assento não pode ser verificada em todos os trechos necessários.
+</p>
+<p align="justify">
+	As operações que podem ser concluídas individualmente incluem a visualização de trechos, a visualização de passagens compradas, o registro e o login. No entanto, caso um servidor fique fora do ar, os trechos específicos desse servidor não serão exibidos ao cliente, fazendo com que as informações pareçam incompletas. Esse problema é registrado como um log no terminal, indicando que houve falha em alguns dos servidores.
+</p>
+
+<p align="justify">
+	Para viabilizar os testes foi criado um script de seed para os bancos de dados, em que cada servidor contém tanto dados específicos quanto compartilhados com os demais.
+
+- incluir testes de concorrencia
+</p>
+
+### Documentação da API
+
+#### Comunicação entre servidores
 #### 1. Cadastro de cliente
 
 **Requisição**
@@ -87,16 +126,14 @@ GET /trechos
 				"id": 3,
 				"numero": 2
 			},
-		
 		],
 		"company": "c",
 		"destino": "Cidade D1",
 		"id": 1,
 		"origem": "Cidade C1"
 	},
-		{
+	{
 		"assentos": [
-			
 			{
 				"disponivel": 1,
 				"id": 8,
@@ -116,14 +153,132 @@ GET /trechos
 ]
 ```
 
-/trecho-reservado - post
-/trechos-reservados/<uuid_passagem> - delete
-/assentos/<id> - put, get
-/passagem - post
-/passagem/user/<user_uuid> - get
-/passagem/<user_uuid>/<passagem_uuid> - delete
+#### 2. Cria trecho reservado, associa trecho, assento e passagem
+**Requisição**
+```
+POST /trecho-reservado
+Content-Type: application/json
 
-- **Comunicação entre clientes e servidores**
+{
+	"id_trecho": 1,
+	"id_assento": 3,
+	"uuid_passagem": uuid-3
+}
+```
+**Resposta**
+```
+{
+	"message": "Trecho reservado"
+}
+```
+
+#### 3. Deleta um ou mais trechos reservados ao solicitar cancelamento de passagem
+**Requisição**
+```
+DELETE /trecho-reservado/<uuid-passagem>
+```
+**Resposta**
+```
+{
+	"message": "Trecho cancelados com sucesso"
+}
+```
+
+#### 3. Busca assento para verificar disponibilidade ou atualiza para disponível ou não disponível
+**Requisição**
+```
+GET /assentos/<id>
+PUT /assentos/<id>
+Content-Type: application/json
+
+{
+	"disponivel": 1
+}
+
+```
+**Resposta**
+```
+{
+	"id": 1,
+	"numero": 5,
+	"id_trecho": 2,
+	"disponivel": 1
+}
+```
+
+#### 4. Cria uma passagem no servidor atual
+**Requisição
+```
+POST /passagem
+Content-Type: application/json
+
+{
+	"user_uuid": "uuid_user1"
+	"uuid": "uuid_passagem1"
+}
+```
+**Resposta**
+```
+{
+	"message": "Passagem criada com sucesso"
+}
+```
+#### 4. Busca passagens associadas a um usuário contendo trechos e assentos reservados
+**Requisição**
+```
+GET /passagem/user/<user_uuid>
+Content-Type: application/json
+```
+
+**Resposta**
+```
+[
+	{
+		"created_at": "Wed, 30 Oct 2024 20:22:37 GMT",
+		"trechosReservados": [
+			{
+				"assento": {
+					"disponivel": 0,
+					"numero": 1
+				},
+				"trecho": {
+					"company": "a",
+					"destino": "Cidade B1",
+					"origem": "Cidade A1"
+				}
+			},
+			{
+				"assento": {
+					"disponivel": 0,
+					"numero": 1
+				},
+				"trecho": {
+					"company": "b",
+					"destino": "Cidade C1",
+					"origem": "Cidade B1"
+				}
+			}
+		],
+		"uuid": "uuid-1"
+	}
+]
+```
+#### 5. Deleta passagem mediante solicitação de cancelamento
+**Requisição**
+```
+DELETE /passagem/<user_uuid>/<passagem_uuid>
+```
+
+**Resposta**
+```
+{
+	"message": "Passagem deletada com sucesso"
+}
+```
+
+---
+
+#### Comunicação entre clientes e servidores
 
 #### 1. Cliente insere login e senha e recebe um token JWT para acessar o servidor atual. Todas as rotas do cliente necessitam do token.
 
@@ -203,7 +358,7 @@ Content-Type: application/json
 Authorization: Bearer Token
 
 {
-    "user_uuid": "uuid2",
+	"user_uuid": "uuid2",
     "trechos": [
         {
             "id_trecho": 1,
@@ -274,41 +429,20 @@ Authorization: Bearer Token
 ```
 
 
+#### Códigos de Status 
 
 
-### Roteamento
+| Código | Significado                       | Descrição e Ação Recomendada                                       |
+|--------|-----------------------------------|--------------------------------------------------------------------|
+| 200    | Sucesso                           | A requisição foi bem-sucedida |
+| 400    | Requisição Inválida               | Dados enviados estão incorretos ou incompletos |
+| 401    | Não Autorizado                    | Acesso não autorizado, token ou credenciais incorretas |
+| 404    | Não Encontrado                    | O recurso solicitado não existe |
+| 500    | Erro Interno do Servidor          | Falha no servidor, pode ter parado de executar ou outros erros|
 
 
 
-### Concorrência Distribuída
-<p align="justify">
-    A fim de evitar que ocorra acessos simultâneos aos dados compartilhados, foi utilizado o Redis para lock distribuído. Todos os servidores se conectam à mesma instância do Redis, quando um cliente solicita uma reserva e envia a requisição com todos os trechos em uma lista através da API, o Redis cria uma chave única contendo o id do trecho, numero do assento e nome da companhia para cada um dos registros da lista e faz o lock em todos, se outra requisição chegar e tentar o lock com a mesma chave, o Redis nega pois só pode haver chaves únicas.
-</p>
 
-
-<p align="justify">
- Em seguida, é feita a verificação de disponibilidade de assento em todos os trechos, se por acaso o assento não estiver disponível em algum, o lock é liberado. Caso passe 30 segundos e a reserva não seja feita, o lock também é liberado, evitando deadlocks. Por fim, é também liberado ao criar a reserva com sucesso.
-
-</p>
-
-
-### Confiabilidade da Solução
-<p align="justify">
-    Caso os servidores sejam desconectados e conectados novamente, os clientes não poderão continuar a operação que estavamfazendo e deve reiniciá-la ao se reconectar. Do ponto de vista da concorrência, o "lock" adquirido ao se solicitar a compra de uma passagem é liberado após 30 segundos em qualquer situação, para evitar que ocorram deadlocks. Além disso, a API foi desenvolvida seguindo o princípio Stateless, em que o estado do cliente não é armazenado entre requisições.
-</p>
-
-
-### Avaliação da Solução
-<p align="justify">
-	Testes foram realizados para avaliar o comportamento do sistema em caso de falha de um dos servidores. Observou-se que, quando todos os servidores não são estritamente necessários para uma operação, os servidores que permanecem ativos conseguem concluir suas tarefas normalmente, em conformidade com o requisito do sistema de que a falha de um servidor não deve impactar os demais. Portanto, ao tentar reservar uma passagem que inclui trechos de todos os três servidores, a operação não é concluída em nenhum deles, pois a disponibilidade de assento não pode ser verificada em todos os trechos necessários.
-</p>
-<p align="justify">
-	As operações que podem ser concluídas individualmente incluem a visualização de trechos, a visualização de passagens compradas, o registro e o login. No entanto, caso um servidor fique fora do ar, os trechos específicos desse servidor não serão exibidos ao cliente, fazendo com que as informações pareçam incompletas. Esse problema é registrado como um log no terminal, indicando que houve falha em alguns dos servidores.
-</p>
-
-<p align="justify">
-- incluir testes de concorrencia
-</p>
 
 ### Documentação do Código
 
