@@ -79,7 +79,7 @@ def get_passagem_all_servers(user_uuid):
     for url in urls:
         try:
             # Solicita todas as passagens do usuário no servidor atual
-            response = requests.get(f"{url}/passagem/user/{user_uuid}")
+            response = requests.get(f"{url}/passagem/user/{user_uuid}", timeout=10)
             if response.status_code == 200:
                 passagens_data = response.json()
 
@@ -99,7 +99,7 @@ def get_passagem_all_servers(user_uuid):
                         }
 
         except Exception as e:
-            return jsonify({"error": f"Erro ao buscar passagem no servidor {url}, {e}"}), 500
+            print(f"Erro ao buscar passagem no servidor {url}, {e}")
 
     todas_passagens = list(passagens_agrupadas.values())
     
@@ -111,6 +111,7 @@ def get_passagem_all_servers(user_uuid):
 
 # deleta passagem em tds os servers (cancelamento)
 @passagens_bp.route("/passagem-all/<user_uuid>/<uuid>", methods=["DELETE"])
+@jwt_required()
 def delete_passagem(user_uuid, uuid):
     try:
         # pega a passagem com os trechos associados
@@ -210,9 +211,7 @@ def reservar_assento():
             response = requests.post(f'{url}/passagem', json={"uuid": uuid_passagem, "user_uuid": data['user_uuid']})
             print(response.status_code)
         except Exception:
-            for key in locked_keys:
-                redis_client.delete(key)
-            return jsonify({"error": "Erro ao criar a passagem"}), 500
+            print("Erro ao criar a passagem no servidor {url}")
 
     # reserva os trechos após criar a passagem, so depois libera os locks
     for trecho, lock_key in zip(data.get('trechos', []), locked_keys):

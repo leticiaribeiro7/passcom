@@ -25,16 +25,92 @@
 
 ### Arquitetura da Solução
 
+#### Banco de Dados
+
+<p align="justify">
+	Foi escolhido o banco de dados relacional PostgreSQL para armazenar as informações do sistema. Cada servidor possui um banco de dados executando isoladamente em seu próprio container Docker. Devido aos requisitos do sistema, existem alguns dados que são compartilhados entre servidores como os usuários e as passagens, foi tomada essa decisão para que o usuário crie sua conta de acesso apenas uma vez, e possa acessar e consultar suas passagens através de qualquer servidor. 
+
+</p>
+<p align="justify">
+	No esquema relacional, tanto a tabela de usuário como a de passagens possui um identificador único associado (UUID) que é o mesmo em todos os bancos de dados, facilitando a busca distribuída.
+</p>
+
+<p align="center">
+    <img src="images/db.png" width="600"/>
+    <br/>
+    <b>Figura 1.</b> Esquema de relações do banco de dados. <b>Fonte:</b> O autor.
+</p>
 
 ### Protocolo de Comunicação
 <p align="justify">
-    Toda a comunicação foi feita através de API REST e seguindo princípios stateless, em que cada requisição recebe todos os dados necessários para ser processada. Os endpoints são protegidos com autenticação JWT, os usuários precisam estar logados para realizar operações.
+    Toda a comunicação foi feita através de API REST, aceitando e enviando dados em formato JSON e seguindo princípios stateless, em que cada requisição recebe todos os dados necessários para ser processada. Os endpoints são protegidos com autenticação JWT, os usuários precisam estar logados para realizar as operações que são: visualizar trechos, comprar passagem, visualizar passagens e cancelar passagem.
     Foram implementados dois conjuntos de rotas:
 </p>
 
 - **Comunicação entre servidores**
-/register post
-/trechos - get
+#### 1. Cadastro de cliente
+
+**Requisição**
+```
+POST /register
+Content-Type: application/json
+
+{
+    "login": "username1",
+    "password": "password1"
+}
+```
+**Resposta**
+```
+{
+    "message": "Usuário criado com sucesso"
+}
+```
+
+#### 2. Busca de trechos no servidor atual
+**Requisição**
+```
+GET /trechos
+```
+**Resposta**
+```
+[
+	{
+		"assentos": [
+			{
+				"disponivel": 1,
+				"id": 3,
+				"numero": 2
+			},
+		
+		],
+		"company": "c",
+		"destino": "Cidade D1",
+		"id": 1,
+		"origem": "Cidade C1"
+	},
+		{
+		"assentos": [
+			
+			{
+				"disponivel": 1,
+				"id": 8,
+				"numero": 4
+			},
+			{
+				"disponivel": 1,
+				"id": 10,
+				"numero": 5
+			}
+		],
+		"company": "c",
+		"destino": "Cidade D2",
+		"id": 2,
+		"origem": "Cidade C2"
+	}
+]
+```
+
 /trecho-reservado - post
 /trechos-reservados/<uuid_passagem> - delete
 /assentos/<id> - put, get
@@ -63,7 +139,7 @@ Content-Type: application/json
 }
 
 ```
-#### 2. Cadastro do cliente no sistema
+#### 2. Cadastro do cliente em todos os servidores
 
 
 **Requisição**

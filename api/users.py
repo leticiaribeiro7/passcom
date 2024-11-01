@@ -43,6 +43,7 @@ def register():
             "password": data.get('password'),
             "uuid": data.get('uuid')
         })
+        return jsonify({"message": "Usuário criado com sucesso"}), 200
     except Exception as e:
         return jsonify({"error": "Erro ao criar usuário"}), 500
 
@@ -50,6 +51,7 @@ def register():
 def create_users_all_servers():
     data = json.loads(request.data)
     uuid_user = str(uuid.uuid4())
+    responses = []
     
     # cria mesmo user em todos os servers
     for url in urls:
@@ -58,14 +60,15 @@ def create_users_all_servers():
                 "uuid": uuid_user,
                 "login": data.get('login'),
                 "password": data.get('password'),
-            })
-            
-            return jsonify({
-                "message": "Usuário criado com sucesso"
-            })
+            }, timeout=10)
         
+            if response.status_code == 200:
+                responses.append(response.json())
+
         except Exception as e:
-            return jsonify({
-                "message": "Erro ao criar usuário"
-            }), 500
-            
+            print(f'Erro no servidor {url}')
+
+    if responses:
+        return responses
+    else:
+        return {"error": "Falha em todos os servidores"}
