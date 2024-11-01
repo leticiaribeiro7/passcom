@@ -468,7 +468,7 @@ Authorization: Bearer Token
 </p>
 
 <p align="justify">
-	O uso de um banco de dados PostgreSQL foi um recurso acrescido durante o desenvolvimento, que possibilitou o armazenamento de informações e consequentemente, uma testagem de concorrência mais fácil. Além disto, a implementação de práticas recomendadas de desenvolvimento, tais como autenticação, correção de erros e documentação da API, auxiliou na segurança do sistema. A aplicação de um sistema de cache com Redis melhorou ainda mais o rendimento, assegurando tempos de resposta ágeis mesmo em situações de alta demanda.
+	O uso de um banco de dados PostgreSQL foi um recurso acrescido durante o desenvolvimento, que possibilitou o armazenamento de informações e consequentemente, uma testagem de concorrência mais fácil. Além disto, a implementação de práticas recomendadas de desenvolvimento, tais como autenticação, correção de erros e documentação da API, junto com a aplicação do Redis como sistema de _lock_ distribuído auxiliou na segurança do sistema.
 </p>
 
 <p align="justify">
