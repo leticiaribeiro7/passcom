@@ -35,6 +35,27 @@ Ainda nesta seção, além dos recursos usados para a construção do sistema, s
 
 ### Arquitetura da Solução
 
+<p align="justify">
+	A arquitetura do sistema é baseada no cliente-servidor, porém contendo uma comunicação entre servidores. Resumidamente, é como se quando um servidor for comunicar com outro, o remetente da mensagem é como um cliente. Além disso, há semelhanças com o modelo de arquitetura Three-Tier. Existem três camadas no PassCom, a de aplicação (com o front-end), a camada de lógica de negócios (com o back-end) e a camada de banco de dados (com PostgreSQL). A diferença é que no Three-Tier o banco de dados geralmente é centralizado, enquanto neste projeto, cada servidor tem um banco de dados isolado. As seções posteriores descrevem essa particularidade e detalham os componentes da arquitetura.
+</p>
+
+<p align="justify">
+Os componentens dessa arquitetura são: 
+</p>
+- **Cliente**: o usuário que interage com o sistema, mandando mensagens e recebendo dos servidores.
+- **Servidores**: existem 3 servidores no PassCom, cada um representando uma companhia aérea de baixo custo. 
+- **Protocolo de comunicação**: utilizado com API REST.
+- *Lógica de negócios**: feita no back-end, é o conjunto de regras, processos e tratamentos de erros que definem toda a parte funcional do sistema. Como a compra de passagem, verificar assento e entre outros.
+- **Banco de dados*: há um banco de dados para a persistência de dados.
+- **Interface de usuário**: [A inserir]
+- **Semelhança com arquitetura de três camadas (Three-Tier)**: a arquitetura é semelhante à Three-Tier por dividir o sistema em camadas de apresentação, lógica de negócios e dados, mas difere por ter múltiplos bancos de dados isolados em contêineres, criando um ambiente distribuído.
+
+<p align="center">
+    <img src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fwiki.inf.ufpr.br%2Fmaziero%2Fdoku.php%3Fid%3Despec%3Aintroducao&psig=AOvVaw2BTphiySyHrY0ICt5TMJ_g&ust=1730648173774000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNDM1v_8vYkDFQAAAAAdAAAAABAE" width="400"/>
+    <br/>
+    <b>Figura 1.</b> Representação do modelo Three-Tier. <b>Fonte:</b> Internet.
+</p>
+
 #### Banco de Dados
 
 <p align="justify">
@@ -55,7 +76,7 @@ Ainda nesta seção, além dos recursos usados para a construção do sistema, s
 <p align="center">
     <img src="images/db.png" width="600"/>
     <br/>
-    <b>Figura 1.</b> Esquema de relações do banco de dados. <b>Fonte:</b> O autor.
+    <b>Figura 2.</b> Esquema de relações do banco de dados. <b>Fonte:</b> O autor.
 </p>
 
 ### Protocolo de Comunicação
@@ -104,7 +125,7 @@ Ainda nesta seção, além dos recursos usados para a construção do sistema, s
 <p align="center">
     <img src="images/teste.png" width="600"/>
     <br/>
-    <b>Figura 2.</b> Teste da concorrência com múltiplas respostas. <b>Fonte:</b> O autor.
+    <b>Figura 3.</b> Teste da concorrência com múltiplas respostas. <b>Fonte:</b> O autor.
 </p>
 
 ### Documentação da API
