@@ -42,8 +42,15 @@ Ainda nesta seção, além dos recursos usados para a construção do sistema, s
 
 </p>
 <p align="justify">
-	No esquema relacional, tanto a tabela de usuário como a de passagens possui um identificador único associado (UUID) que é o mesmo em todos os bancos de dados, facilitando a busca distribuída.
+	No esquema relacional, tanto a tabela de usuário como a de passagens possui um identificador único associado (UUID) que é o mesmo em todos os bancos de dados, facilitando a busca distribuída. 
+	O fluxo de reserva funciona da seguinte forma:
 </p>
+
+1. Criação de uma passagem em todos os servidores relacionada ao uuid do usuário solicitante
+2. Criação de trechos reservados a partir de cada um dos trechos escolhidos, associando também o assento respectivo. São criados no servidor de cada companhia que o trecho pertence
+3. Os assentos são alterados para não disponiveis
+4. Associação dos trechos reservados à passagem, facilitando o agrupamento na visualização das passagens
+
 
 <p align="center">
     <img src="images/db.png" width="600"/>
@@ -92,8 +99,12 @@ Ainda nesta seção, além dos recursos usados para a construção do sistema, s
 
 <p align="justify">
 	Para viabilizar os testes foi criado um script de seed para os bancos de dados, em que cada servidor contém tanto dados específicos quanto compartilhados com os demais.
-
-- incluir testes de concorrencia
+	A concorrência foi testada executando um script com 30 requests simultâneos em cada servidor, todos tentando comprar o mesmo assento no mesmo trecho, apenas um conseguiu efetuar a compra e o restante recebeu uma mensagem de conflito, indicando que outro cliente estava reservando o assento em questão. Abaixo, o resultado da execução do script no terminal:
+</p>
+<p align="center">
+    <img src="images/teste.png" width="600"/>
+    <br/>
+    <b>Figura 2.</b> Teste da concorrência com múltiplas respostas. <b>Fonte:</b> O autor.
 </p>
 
 ### Documentação da API
