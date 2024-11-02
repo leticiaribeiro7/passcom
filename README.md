@@ -40,18 +40,19 @@ Ainda nesta seção, além dos recursos usados para a construção do sistema, s
 </p>
 
 <p align="justify">
-Os componentens dessa arquitetura são: 
+Os componentes dessa arquitetura são: 
 </p>
+
 - **Cliente**: o usuário que interage com o sistema, mandando mensagens e recebendo dos servidores.
-- **Servidores**: existem 3 servidores no PassCom, cada um representando uma companhia aérea de baixo custo. 
+- **Servidores**: existem 3 servidores no PassCom, cada um representando uma companhia aérea de baixo custo.
 - **Protocolo de comunicação**: utilizado com API REST.
-- *Lógica de negócios**: feita no back-end, é o conjunto de regras, processos e tratamentos de erros que definem toda a parte funcional do sistema. Como a compra de passagem, verificar assento e entre outros.
-- **Banco de dados*: há um banco de dados para a persistência de dados.
+- **Lógica de negócios**: feita no back-end, é o conjunto de regras, processos e tratamentos de erros que definem toda a parte funcional do sistema, como a compra de passagem, verificação de assento, entre outros.
+- **Banco de dados**: há um banco de dados para a persistência de dados.
 - **Interface de usuário**: [A inserir]
 - **Semelhança com arquitetura de três camadas (Three-Tier)**: a arquitetura é semelhante à Three-Tier por dividir o sistema em camadas de apresentação, lógica de negócios e dados, mas difere por ter múltiplos bancos de dados isolados em contêineres, criando um ambiente distribuído.
 
 <p align="center">
-    <img src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fwiki.inf.ufpr.br%2Fmaziero%2Fdoku.php%3Fid%3Despec%3Aintroducao&psig=AOvVaw2BTphiySyHrY0ICt5TMJ_g&ust=1730648173774000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNDM1v_8vYkDFQAAAAAdAAAAABAE" width="400"/>
+    <img src="" width="400"/>
     <br/>
     <b>Figura 1.</b> Representação do modelo Three-Tier. <b>Fonte:</b> Internet.
 </p>
