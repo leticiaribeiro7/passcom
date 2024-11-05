@@ -1,0 +1,92 @@
+services:
+  company_a:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: "postgresql://user:password@db_a:5432/company_a"
+      CURRENT_SERVER: "http://company_a:5000"
+      COMPANY_NAME: "a"
+      REDIS_HOST: redis
+    depends_on:
+      - db_a
+      - redis
+    networks:
+      - company_network
+    restart: always
+
+  company_b:
+    build: .
+    ports:
+      - "5001:5000"
+    environment:
+      DATABASE_URL: "postgresql://user:password@db_b:5432/company_b"
+      CURRENT_SERVER: "http://company_b:5000"
+      COMPANY_NAME: "b"
+      REDIS_HOST: redis
+    depends_on:
+      - db_b
+      - redis
+    networks:
+      - company_network
+    restart: always
+
+  company_c:
+    build: .
+    ports:
+      - "5002:5000"
+    environment:
+      DATABASE_URL: "postgresql://user:password@db_c:5432/company_c"
+      CURRENT_SERVER: "http://company_c:5000"
+      COMPANY_NAME: "c"
+      REDIS_HOST: redis
+    depends_on:
+      - db_c
+      - redis
+    networks:
+      - company_network
+    restart: always
+    
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - company_network
+      
+  db_a:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: company_a
+    ports:
+      - "5432:5432"
+    networks:
+      - company_network
+
+  db_b:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: company_b
+    ports:
+      - "5433:5432"
+    networks:
+      - company_network
+
+  db_c:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: company_c
+    ports:
+      - "5434:5432"
+    networks:
+      - company_network
+
+networks:
+  company_network:
+    driver: bridge
