@@ -1,5 +1,7 @@
 from flask import Flask, render_template
 
+# código de ativação da interface web
+
 app = Flask(__name__)
 
 @app.route('/')

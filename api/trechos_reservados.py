@@ -16,6 +16,7 @@ def post_trecho():
 
     return jsonify({"message": "Trecho reservado"}), 200
 
+
 @trechos_reservados_bp.route("/trechos-reservados/<uuid_passagem>", methods=["DELETE"])
 def delete_trecho(uuid_passagem):
     try:

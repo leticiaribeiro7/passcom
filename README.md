@@ -26,7 +26,7 @@ O projeto foi criado com uma arquitetura baseada em contêineres, utilizando Doc
 </p>
 
 <p align="justify">
-Para aprimorar o desempenho, o Redis foi incorporado como um cache distribuído, estabelecendo bloqueios distribuídos. A interface do usuário foi desenvolvida com React, proporcionando uma interface dinâmica e responsiva, interagindo com o backend através da API. É importante ressaltar que a linguagem de programação utilizada foi Python, usando o VSCode como editor de código-fonte. Além disso, o Docker Compose conduziu a integração de todos os serviços, assegurando um ambiente de desenvolvimento estável e de fácil utilização.
+Para aprimorar o desempenho, o Redis foi incorporado como um cache distribuído, estabelecendo bloqueios distribuídos. A interface do usuário foi desenvolvida com JavaScript, HTML e CSS, proporcionando uma interface simples, mas dinâmica e responsiva, interagindo com o backend através da API. É importante ressaltar que a linguagem de programação principal utilizada foi Python, usando o VSCode como editor de código-fonte. Além disso, o Docker Compose conduziu a integração de todos os serviços, assegurando um ambiente de desenvolvimento estável e de fácil utilização.
 </p>
 
 <p align="justify">
@@ -48,7 +48,7 @@ Os componentes dessa arquitetura são:
 - **Protocolo de comunicação**: utilizado com API REST.
 - **Lógica de negócios**: feita no back-end, é o conjunto de regras, processos e tratamentos de erros que definem toda a parte funcional do sistema, como a compra de passagem, verificação de assento, entre outros.
 - **Banco de dados**: há um banco de dados para a persistência de dados.
-- **Interface de usuário**: [A inserir]
+- **Interface de usuário**: a interface web foi um bônus do sistema, visto que não era um requisito obrigatório. Em prol disso, possui uma aparência simples, mas legível e funcional.
 - **Semelhança com arquitetura de três camadas (Three-Tier)**: a arquitetura é **semelhante** à Three-Tier por dividir o sistema em camadas de apresentação, lógica de negócios e dados, mas difere por ter múltiplos bancos de dados isolados em contêineres, criando um ambiente distribuído.
 
 <p align="center">
@@ -89,7 +89,7 @@ Os componentes dessa arquitetura são:
 
 ### Roteamento
 <p align="justify">
-	Para verificar o roteamento do sistema, foi implementado um script de teste que se assemelha a um algoritmo de busca em profundidade (DFS - Depth-First Search) para o cálculo distribuído das rotas entre origem e destino da passagem. Com esse método é possível buscar todas as possibilidades de trechos disponíveis, usando outros trechos como intermediários na ausência de voos diretos. 
+	Para verificar o roteamento do sistema, foi implementado um script de teste que se assemelha a um algoritmo de busca em profundidade (DFS - Depth-First Search) para o cálculo distribuído das rotas entre origem e destino da passagem. Com esse método é possível buscar todas as possibilidades de trechos disponíveis, usando outros trechos como intermediários na ausência de voos diretos. No código da API, por sua vez, há uma modificação para se adaptar a interface web do sistema, porém, o cálculo dos trechos ainda se parece com um DFS. 
 </p>
 <p align="justify">
 	Para exibição desse teste de roteamento, é exibido no terminal a quantidade de rotas e quais são elas. Esta estratégia assegura que os usuários possam analisar várias alternativas de passagens aéreas. A seguir, dois exemplos distintos que foram executados diantes as informações que estão banco de dados do PassCom.

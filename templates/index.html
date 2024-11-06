@@ -4,17 +4,15 @@
     <title>PassCom!</title>
     <link rel="stylesheet" href="/static/style.css">
     <script>
-        // Função para salvar o servidor no localStorage
+        // escolhe a companhia e salvar o servidor no localStorage
         function escolherServidor(porta) {
             localStorage.setItem("portaServidor", porta);
             document.getElementById("opcoesAcesso").style.display = "block";
         }
 
-        // Função para redirecionar para Login ou Registrar
         function acessarPagina(rota) {
             const portaServidor = localStorage.getItem("portaServidor");
             if (portaServidor) {
-                // Redireciona para a rota correta com a porta do servidor escolhida
                 window.location.href = `/${rota}`;
             } else {
                 alert("Por favor, selecione um servidor primeiro.");

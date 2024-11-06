@@ -1,4 +1,5 @@
-/* Define o estilo geral do corpo */
+/* css base para as telas da interface web */
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #eef2f7;
@@ -6,11 +7,10 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* Ocupa a altura total da janela */
+    height: 100vh;
     margin: 0;
 }
 
-/* Estiliza o contêiner principal */
 .container {
     background-color: #ffffff;
     border-radius: 8px;
@@ -22,13 +22,11 @@ body {
     box-sizing: border-box;
 }
 
-/* Títulos */
 h1, h2 {
     color: #444;
     margin-bottom: 20px;
 }
 
-/* Links */
 a {
     display: inline-block;
     color: #007BFF;
@@ -41,7 +39,6 @@ a:hover {
     text-decoration: underline;
 }
 
-/* Formulário */
 form {
     display: flex;
     flex-direction: column;
@@ -68,7 +65,6 @@ input:focus {
     border-color: #007BFF;
 }
 
-/* Botão de enviar */
 button {
     background-color: #007BFF;
     color: white;
@@ -89,8 +85,8 @@ button:hover {
     border: 1px solid #ddd;
     border-radius: 5px;
     max-width: 600px;
-    margin: 20px auto; /* Centraliza o container principal */
-    text-align: center; /* Centraliza o texto */
+    margin: 20px auto; 
+    text-align: center;
 }
 
 .detalhes-passagem h2, .detalhes-passagem h3 {
@@ -109,7 +105,7 @@ button:hover {
 .tabela-trechos th, .tabela-trechos td {
     border: 1px solid #ddd;
     padding: 10px;
-    text-align: center; /* Centraliza o conteúdo da célula */
+    text-align: center; 
 }
 
 .tabela-trechos th {

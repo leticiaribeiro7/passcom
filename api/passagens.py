@@ -168,7 +168,7 @@ def reservar_assento():
 
     data = json.loads(request.data)
     uuid_passagem = str(uuid.uuid4())
-    locked_keys = []  # Lista de locks para liberar no final
+    locked_keys = []  # lista de locks para liberar no final
 
     # verifica disponibilidade e bloqueia todos os assentos
     for trecho in data.get('trechos', []):

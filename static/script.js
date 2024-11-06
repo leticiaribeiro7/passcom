@@ -1,12 +1,10 @@
 document.getElementById('register-form').addEventListener('submit', async function(event) {
-    event.preventDefault(); // Impede o envio padrão do formulário
+    event.preventDefault();
 
-    // Coleta os dados do formulário
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     const uuid = document.getElementById('uuid').value;
 
-    // Prepara o corpo da requisição
     const requestData = {
         username: username,
         password: password,
@@ -16,7 +14,6 @@ document.getElementById('register-form').addEventListener('submit', async functi
     const portaServidor = localStorage.getItem("portaServidor");
 
     try {
-        // Faz a requisição POST para a API
         const response = await fetch(`http://localhost:${portaServidor}/register-all`, {
             method: 'POST',
             headers: {

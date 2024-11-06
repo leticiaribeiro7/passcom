@@ -10,7 +10,6 @@ from utils import urls, get_user
 users_bp = Blueprint("users", __name__)
 
 
-
 @users_bp.route('/login', methods=['POST'])
 def login():
     data = json.loads(request.data)
@@ -39,6 +38,7 @@ def register():
         return jsonify({"message": "Usuário criado com sucesso"}), 200
     except Exception as e:
         return jsonify({"error": "Erro ao criar usuário"}), 500
+
 
 @users_bp.route("/register-all", methods=["POST"])
 def create_users_all_servers():

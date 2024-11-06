@@ -24,7 +24,7 @@
                 const loginField = document.getElementById('login');
                 const passwordField = document.getElementById('password');
                 
-                // Verifica se os campos existem antes de acessá-los
+                // verifica se os campos existem
                 if (!loginField || !passwordField) {
                     console.error("Os campos de login ou senha não foram encontrados.");
                     return;
@@ -47,7 +47,6 @@
 
                     if (response.ok) {
                         alert('Registro bem-sucedido!');
-                        // Redireciona para a página de login ou outra página após o registro
                         window.location.href = "/login";
                     } else {
                         alert('Erro: ' + (result.message || 'Não foi possível registrar.'));
