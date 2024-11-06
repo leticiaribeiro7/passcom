@@ -1,45 +1,37 @@
-document.getElementById('login-form').addEventListener('submit', async function(event) {
-    event.preventDefault();
-    const login = document.getElementById('login').value;
+document.getElementById('register-form').addEventListener('submit', async function(event) {
+    event.preventDefault(); // Impede o envio padrão do formulário
+
+    // Coleta os dados do formulário
+    const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
+    const uuid = document.getElementById('uuid').value;
 
-    const response = await fetch('/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ login, password })
-    });
+    // Prepara o corpo da requisição
+    const requestData = {
+        username: username,
+        password: password,
+        uuid: uuid
+    };
 
-    if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('token', data.access_token);
-        alert('Login realizado com sucesso!');
-        window.location.href = '/rotas';
-    } else {
-        alert('Credenciais inválidas');
+    try {
+        // Faz a requisição POST para a API
+        const response = await fetch('/api/users/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert('Cadastro realizado com sucesso!');
+        } else {
+            alert('Erro: ' + result.message);
+        }
+    } catch (error) {
+        console.error('Erro na requisição:', error);
+        alert('Ocorreu um erro ao tentar realizar o cadastro.');
     }
 });
-
-// Lógica para buscar rotas
-async function fetchRotas() {
-    const token = localStorage.getItem('token');
-    const response = await fetch('/all-trechos', {
-        headers: { 'Authorization': `Bearer ${token}` }
-    });
-
-    if (response.ok) {
-        const rotas = await response.json();
-        const container = document.getElementById('rotas-container');
-        rotas.forEach(rota => {
-            const div = document.createElement('div');
-            div.textContent = `Origem: ${rota.origem}, Destino: ${rota.destino}`;
-            container.appendChild(div);
-        });
-    } else {
-        alert('Erro ao buscar rotas');
-    }
-}
-
-// Chama a função para buscar rotas quando a página carrega
-if (window.location.pathname === '/rotas') {
-    fetchRotas();
-}

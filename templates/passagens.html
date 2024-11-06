@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Passagens</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Minhas Passagens</h2>
+        <div id="passagens-container">
+            <!-- O conteúdo das passagens será carregado dinamicamente -->
+        </div>
+
+        <script>
+            // Função para buscar passagens
+            async function fetchPassagens() {
+                const userUuid = "SEU_USER_UUID_AQUI"; // Substitua pelo UUID do usuário atual
+                try {
+                    const response = await fetch(`/passagens-all/${userUuid}`, {
+                        headers: {
+                            'Authorization': `Bearer SEU_TOKEN_JWT_AQUI` // Substitua pelo token JWT
+                        }
+                    });
+                    const passagens = await response.json();
+
+                    if (response.ok) {
+                        displayPassagens(passagens);
+                    } else {
+                        document.getElementById("passagens-container").innerText = passagens.message || "Nenhuma passagem encontrada.";
+                    }
+                } catch (error) {
+                    console.error("Erro ao buscar passagens:", error);
+                    document.getElementById("passagens-container").innerText = "Erro ao buscar passagens.";
+                }
+            }
+
+            // Função para exibir as passagens na página
+            function displayPassagens(passagens) {
+                const container = document.getElementById("passagens-container");
+                container.innerHTML = ""; // Limpa o conteúdo atual
+
+                passagens.forEach(passagem => {
+                    const passagemDiv = document.createElement("div");
+                    passagemDiv.classList.add("passagem");
+
+                    const detalhes = `
+                        <p>Passagem UUID: ${passagem.uuid}</p>
+                        <p>Data de Criação: ${new Date(passagem.created_at).toLocaleString()}</p>
+                        <p>Trechos Reservados:</p>
+                        <ul>
+                            ${passagem.trechosReservados.map(trecho => `
+                                <li>
+                                    Origem: ${trecho.trecho.origem}, Destino: ${trecho.trecho.destino}, Companhia: ${trecho.trecho.company}, 
+                                    Assento: ${trecho.assento.numero}, Disponível: ${trecho.assento.disponivel ? "Sim" : "Não"}
+                                </li>
+                            `).join("")}
+                        </ul>
+                    `;
+
+                    passagemDiv.innerHTML = detalhes;
+
+                    // Botão de cancelar
+                    const cancelButton = document.createElement("button");
+                    cancelButton.innerText = "Cancelar";
+                    cancelButton.onclick = () => cancelarPassagem(passagem.uuid);
+                    passagemDiv.appendChild(cancelButton);
+
+                    container.appendChild(passagemDiv);
+                });
+            }
+
+            // Função para cancelar uma passagem
+            async function cancelarPassagem(uuid) {
+                const userUuid = "SEU_USER_UUID_AQUI"; // Substitua pelo UUID do usuário atual
+                if (confirm("Tem certeza de que deseja cancelar esta passagem?")) {
+                    try {
+                        const response = await fetch(`/passagem-all/${userUuid}/${uuid}`, {
+                            method: "DELETE",
+                            headers: {
+                                'Authorization': `Bearer SEU_TOKEN_JWT_AQUI` // Substitua pelo token JWT
+                            }
+                        });
+
+                        if (response.ok) {
+                            alert("Passagem cancelada com sucesso.");
+                            fetchPassagens(); // Atualiza a lista de passagens
+                        } else {
+                            const result = await response.json();
+                            alert("Erro ao cancelar: " + (result.message || "Tente novamente."));
+                        }
+                    } catch (error) {
+                        console.error("Erro ao cancelar a passagem:", error);
+                        alert("Ocorreu um erro ao cancelar a passagem.");
+                    }
+                }
+            }
+
+            // Chama a função para buscar as passagens ao carregar a página
+            fetchPassagens();
+        </script>
+    </div>
+</body>
+</html>

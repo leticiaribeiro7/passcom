@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Opções</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Bem-vindo!</h2>
+        <p>Escolha uma opção:</p>
+        <button onclick="verPassagens()">Ver Passagens</button>
+        <button onclick="verRotas()">Ver Rotas</button>
+
+        <script>
+            // Função para redirecionar para a página de passagens
+            function verPassagens() {
+                window.location.href = "/passagens.html";
+            }
+
+            // Função para redirecionar para a página de rotas/comprar
+            function verRotas() {
+                window.location.href = "/rotas.html";
+            }
+        </script>
+    </div>
+</body>
+</html>

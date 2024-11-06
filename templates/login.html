@@ -3,16 +3,117 @@
 <head>
     <title>Login</title>
     <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px 30px;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            text-align: left;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: #007BFF;
+        }
+
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007BFF;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <h2>Login</h2>
-    <form id="login-form">
-        <label for="login">Login:</label>
-        <input type="text" id="login" name="login" required>
-        <label for="password">Senha:</label>
-        <input type="password" id="password" name="password" required>
-        <button type="submit">Entrar</button>
-    </form>
-    <script src="/static/script.js"></script>
+    <div class="container">
+        <h2>Login</h2>
+        <form id="login-form">
+            <label for="login">Login:</label>
+            <input type="text" id="login" name="login" required>
+            <label for="password">Senha:</label>
+            <input type="password" id="password" name="password" required>
+            <button type="submit">Entrar</button>
+        </form>
+
+        <script>
+            document.getElementById('login-form').addEventListener('submit', async function(event) {
+                event.preventDefault();
+                const login = document.getElementById('login').value;
+                const password = document.getElementById('password').value;
+
+                try {
+                    // Faz a requisição de login
+                    const response = await fetch('/api/users/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ login, password })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        // Armazena o token JWT no localStorage
+                        localStorage.setItem('token', result.access_token);
+                        localStorage.setItem('user_uuid', result.uuid_user);
+
+                        // Redireciona o usuário para a página de opções
+                        window.location.href = "/opcoes.html";
+                    } else {
+                        alert('Erro: ' + result.message);
+                    }
+                } catch (error) {
+                    console.error('Erro na requisição:', error);
+                    alert('Ocorreu um erro ao tentar fazer login.');
+                }
+            });
+        </script>
+    </div>
 </body>
 </html>

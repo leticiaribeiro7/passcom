@@ -1,26 +1,83 @@
+/* Define o estilo geral do corpo */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 20px;
-    padding: 20px;
-}
-h1, h2 {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #eef2f7;
     color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Ocupa a altura total da janela */
+    margin: 0;
 }
+
+/* Estiliza o contêiner principal */
+.container {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+}
+
+/* Títulos */
+h1, h2 {
+    color: #444;
+    margin-bottom: 20px;
+}
+
+/* Links */
 a {
-    display: block;
-    margin-top: 10px;
+    display: inline-block;
     color: #007BFF;
     text-decoration: none;
+    font-weight: 500;
+    margin-top: 15px;
 }
+
 a:hover {
     text-decoration: underline;
 }
+
+/* Formulário */
 form {
     display: flex;
     flex-direction: column;
-    width: 300px;
+    width: 100%;
 }
-label, input, button {
-    margin-bottom: 10px;
+
+label {
+    text-align: left;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+input, button {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+input:focus {
+    border-color: #007BFF;
+}
+
+/* Botão de enviar */
+button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
 }
