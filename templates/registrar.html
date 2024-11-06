@@ -8,19 +8,56 @@
     <div class="container">
         <h2>Cadastro</h2>
         <form id="register-form">
-            <label for="username">Nome de usuário:</label>
-            <input type="text" id="username" name="username" required><br>
+            <label for="login">Nome de usuário:</label>
+            <input type="text" id="login" name="login" required><br>
 
             <label for="password">Senha:</label>
             <input type="password" id="password" name="password" required><br>
 
-            <label for="uuid">UUID:</label>
-            <input type="text" id="uuid" name="uuid" required><br>
-
             <button type="submit">Registrar</button>
         </form>
 
-        <script src="/static/script.js"></script>
+        <script>
+            document.getElementById('register-form').addEventListener('submit', async function(event) {
+                event.preventDefault();
+                
+                const loginField = document.getElementById('login');
+                const passwordField = document.getElementById('password');
+                
+                // Verifica se os campos existem antes de acessá-los
+                if (!loginField || !passwordField) {
+                    console.error("Os campos de login ou senha não foram encontrados.");
+                    return;
+                }
+
+                const portaServidor = localStorage.getItem("portaServidor");
+                const login = loginField.value;
+                const password = passwordField.value;
+
+                try {
+                    const response = await fetch(`http://localhost:${portaServidor}/register-all`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ login, password })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        alert('Registro bem-sucedido!');
+                        // Redireciona para a página de login ou outra página após o registro
+                        window.location.href = "/login";
+                    } else {
+                        alert('Erro: ' + (result.message || 'Não foi possível registrar.'));
+                    }
+                } catch (error) {
+                    console.error('Erro na requisição:', error);
+                    alert('Ocorreu um erro ao tentar registrar.');
+                }
+            });
+        </script>
     </div>
 </body>
 </html>

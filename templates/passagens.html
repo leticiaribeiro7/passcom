@@ -4,25 +4,108 @@
     <title>Passagens</title>
     <link rel="stylesheet" href="/static/style.css">
     <script src="/static/script.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 90%;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            max-height: 90vh; 
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        #passagens-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .passagem {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .detalhes-passagem {
+            margin-bottom: 10px;
+        }
+
+        .detalhes-passagem h3 {
+            margin-top: 15px;
+            color: #333;
+        }
+
+        .tabela-trechos {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .tabela-trechos th, .tabela-trechos td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .tabela-trechos th {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #FF4B4B;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #d43f3f;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h2>Minhas Passagens</h2>
         <div id="passagens-container">
-            <!-- O conteúdo das passagens será carregado dinamicamente -->
+            
         </div>
 
         <script>
             // Função para buscar passagens
             async function fetchPassagens() {
-                const userUuid = localStorage.getItem('user_uuid'); // Substitua pelo UUID do usuário atual
+                const userUuid = localStorage.getItem('user_uuid');
                 const token = localStorage.getItem('token');
                 const portaServidor = localStorage.getItem("portaServidor");
 
                 try {
                     const response = await fetch(`http://localhost:${portaServidor}/passagens-all/${userUuid}`, {
                         headers: {
-                            'Authorization': `Bearer ${token}` // Substitua pelo token JWT
+                            'Authorization': `Bearer ${token}`
                         }
                     });
                     const passagens = await response.json();
@@ -41,7 +124,7 @@
             // Função para exibir as passagens na página
             function displayPassagens(passagens) {
                 const container = document.getElementById("passagens-container");
-                container.innerHTML = ""; // Limpa o conteúdo atual
+                container.innerHTML = "";
 
                 passagens.forEach(passagem => {
                     const passagemDiv = document.createElement("div");
@@ -77,10 +160,8 @@
                     </div>
                 `;
 
-
                     passagemDiv.innerHTML = detalhes;
 
-                    // Botão de cancelar
                     const cancelButton = document.createElement("button");
                     cancelButton.innerText = "Cancelar";
                     cancelButton.onclick = () => cancelarPassagem(passagem.uuid);
@@ -90,9 +171,8 @@
                 });
             }
 
-            // Função para cancelar uma passagem
             async function cancelarPassagem(uuid) {
-                const userUuid = localStorage.getItem('user_uuid'); // Substitua pelo UUID do usuário atual
+                const userUuid = localStorage.getItem('user_uuid');
                 const portaServidor = localStorage.getItem("portaServidor");
                 const token = localStorage.getItem('token');
 
@@ -101,13 +181,13 @@
                         const response = await fetch(`http://localhost:${portaServidor}/passagem-all/${userUuid}/${uuid}`, {
                             method: "DELETE",
                             headers: {
-                                'Authorization': `Bearer ${token}` // Substitua pelo token JWT
+                                'Authorization': `Bearer ${token}`
                             }
                         });
 
                         if (response.ok) {
                             alert("Passagem cancelada com sucesso.");
-                            fetchPassagens(); // Atualiza a lista de passagens
+                            fetchPassagens();
                         } else {
                             const result = await response.json();
                             alert("Erro ao cancelar: " + (result.message || "Tente novamente."));
@@ -119,7 +199,6 @@
                 }
             }
 
-            // Chama a função para buscar as passagens ao carregar a página
             fetchPassagens();
         </script>
     </div>
