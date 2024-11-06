@@ -15,3 +15,4 @@ RUN chmod +x start.sh
 ENV FLASK_APP=main.py
 
 CMD ["./start.sh"]
+

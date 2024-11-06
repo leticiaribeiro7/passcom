@@ -63,7 +63,7 @@ print("Todos os trechos recebidos:")
 for trecho in todos_trechos:
     print(trecho)
 
-# Agora, vamos calcular as rotas
+# Cálculo das rotas
 origem = "Sao Paulo"
 destino = "Florianopolis"
 rotas = []
