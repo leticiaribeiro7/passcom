@@ -1,14 +1,216 @@
 <!DOCTYPE html>
 <html>
 <head>
+<link rel="stylesheet" href="/static/style.css">
     <title>Rotas Disponíveis</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        label, select, button {
+            margin: 10px;
+        }
+        .trecho-info {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h2>Rotas Disponíveis</h2>
-        <div id="rotas-container"></div>
-        <script src="/static/script.js"></script>
+        
+        <!-- Selects para origem e destino -->
+        <label for="origem">Origem:</label>
+        <select id="origem"></select>
+
+        <label for="destino">Destino:</label>
+        <select id="destino"></select>
+
+        <!-- Botão para buscar os trechos -->
+        <button onclick="buscarTrechos()">Buscar Trechos</button>
+
+        <!-- Contêiner para exibir os assentos disponíveis -->
+        <div id="assentos-container"></div>
     </div>
+
+    <script>
+        // URL das APIs
+        const portaServidor = localStorage.getItem('portaServidor')
+        const token = localStorage.getItem('token')
+        const apiAllTrechosUrl = `http://localhost:${portaServidor}/all-trechos`;
+        const apiRotasUrl = `http://localhost:${portaServidor}/rotas`;
+
+        // Função para carregar origens e destinos únicos
+        async function carregarOrigensEDestinos() {
+            try {
+                const response = await fetch(apiAllTrechosUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                const trechos = await response.json();
+
+                const origens = new Set();
+                const destinos = new Set();
+
+                // Obter origens e destinos únicos
+                trechos.forEach(trecho => {
+                    origens.add(trecho.origem);
+                    destinos.add(trecho.destino);
+                });
+
+                // Preencher o select de origem
+                const origemSelect = document.getElementById("origem");
+                origens.forEach(origem => {
+                    const option = document.createElement("option");
+                    option.value = origem;
+                    option.textContent = origem;
+                    origemSelect.appendChild(option);
+                });
+
+                // Preencher o select de destino
+                const destinoSelect = document.getElementById("destino");
+                destinos.forEach(destino => {
+                    const option = document.createElement("option");
+                    option.value = destino;
+                    option.textContent = destino;
+                    destinoSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error("Erro ao carregar origens e destinos:", error);
+            }
+        }
+
+        // Função para buscar trechos com base na origem e destino selecionados
+        async function buscarTrechos() {
+            const origem = document.getElementById("origem").value;
+            const destino = document.getElementById("destino").value;
+
+            try {
+                const response = await fetch(apiRotasUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ origem, destino })
+                });
+
+                const rotas = await response.json();
+
+                const assentosContainer = document.getElementById("assentos-container");
+                assentosContainer.innerHTML = ""; // Limpar o contêiner
+
+                let reservas = []; // Armazenar as reservas de assentos
+
+                if (rotas.length > 0) {
+                    rotas.forEach(trecho => {
+                        const trechoInfo = document.createElement("div");
+                        trechoInfo.classList.add("trecho-info");
+                        trechoInfo.innerHTML = `
+                            <h3>Rota: ${trecho.origem} para ${trecho.destino} (${trecho.company})</h3>
+                        `;
+
+                        // Cria o select para escolher um assento
+                        const assentosSelect = document.createElement("select");
+                        assentosSelect.classList.add("assento-select");
+                        
+                        // Adiciona uma opção padrão
+                        const defaultOption = document.createElement("option");
+                        defaultOption.textContent = "Selecione um assento";
+                        defaultOption.value = "";
+                        assentosSelect.appendChild(defaultOption);
+
+
+                        const assentosUnicos = new Set();
+                        trecho.assentos.forEach(assento => {
+                            if (!assentosUnicos.has(assento.numero)) {
+                                assentosUnicos.add(assento.numero); // Adiciona o número ao Set
+
+                                const option = document.createElement("option");
+                                option.value = assento.id;  // Valor é o 'id' do assento
+                                option.textContent = `Assento ${assento.numero}`; // Texto é o 'numero' do assento
+                                assentosSelect.appendChild(option);
+    }
+                        });
+
+                           // Armazenar a seleção do assento
+                        assentosSelect.addEventListener("change", (e) => {
+                            const selectedAssento = e.target.value;
+                            if (selectedAssento) {
+                                reservas.push({
+                                    id_trecho: trecho.id_trecho,
+                                    id_assento: parseInt(selectedAssento),
+                                    company: trecho.company
+                                });
+                            }
+                        });
+
+                        // Adiciona o seletor de assentos ao trecho
+                        trechoInfo.appendChild(assentosSelect);
+                        assentosContainer.appendChild(trechoInfo);
+
+                });
+
+                 // Adicionar o botão de reserva
+                const reservaButton = document.createElement("button");
+                reservaButton.textContent = "Reservar Assentos";
+                reservaButton.addEventListener("click", async () => {
+
+                if (reservas.length > 0) {
+                    const portaServidor = localStorage.getItem('portaServidor')
+                    const user_uuid = localStorage.getItem('user_uuid');  // Você pode substituir esse UUID pelo valor real do usuário
+                    const token = localStorage.getItem('token')
+                    // Objeto de reserva
+                    const reservaData = {
+                        user_uuid: user_uuid,
+                        trechos: reservas
+                    };
+
+                    // Enviar a reserva para a API
+                    try {
+                        const reservaResponse = await fetch(`http://localhost:${portaServidor}/reservar`, { // Substitua pela URL real da sua API
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify(reservaData)
+                        });
+
+                        const reservaResult = await reservaResponse.json();
+                        console.log(reservaResult)
+                        if (reservaResult.message) {
+                            alert(reservaResult.message);
+                        } else {
+                            alert("Falha na reserva. Tente novamente.");
+                        }
+                    } catch (error) {
+                        console.error("Erro ao realizar reserva:", error);
+                        alert("Erro ao realizar reserva.");
+                    }
+                } else {
+                    alert("Selecione os assentos antes de reservar.");
+                }
+            });
+
+            assentosContainer.appendChild(reservaButton);
+
+                } else {
+                    assentosContainer.innerHTML = "<p>Nenhuma rota disponível para esta origem e destino.</p>";
+                }
+            } catch (error) {
+                console.error("Erro ao buscar trechos:", error);
+            }
+        }
+
+        // Carregar as origens e destinos ao carregar a página
+        window.onload = carregarOrigensEDestinos;
+    </script>
 </body>
 </html>

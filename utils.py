@@ -10,7 +10,7 @@ urls = [
 
 
 def check_disponibilidade(trecho, redis_client):
-    lock_key = f"company_{trecho.get('company')}_trecho_{trecho.get('id_trecho')}_assento_{trecho.get('numero_assento')}"
+    lock_key = f"company_{trecho.get('company')}_trecho_{trecho.get('id_trecho')}_assento_{trecho.get('id_assento')}"
     lock_acquired = redis_client.set(lock_key, "locked", nx=True, ex=30)
 
     if not lock_acquired:

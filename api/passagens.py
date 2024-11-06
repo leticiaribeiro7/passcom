@@ -131,7 +131,7 @@ def delete_passagem(user_uuid, uuid):
 
             try:
                 requests.delete(f"http://company_{trechoReservado.trecho.company}:5000/trechos-reservados/{uuid}")
-                requests.put(f"http://company_{trechoReservado.trecho.company}:5000/assentos/{trechoReservado.assento.id}", json={"disponivel": 1})
+                requests.put(f"http://company_{trechoReservado.trecho.company}:5000/assentos/{trechoReservado.assento.numero}", json={"disponivel": 1})
             except Exception as e:
                return jsonify({"error": str(e)}), 500
 
