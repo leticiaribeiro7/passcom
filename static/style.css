@@ -18,7 +18,7 @@ body {
     padding: 30px;
     text-align: center;
     width: 100%;
-    max-width: 400px;
+    max-width: 600px;
     box-sizing: border-box;
 }
 
@@ -80,4 +80,39 @@ button {
 
 button:hover {
     background-color: #0056b3;
+}
+
+
+.detalhes-passagem {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    max-width: 600px;
+    margin: 20px auto; /* Centraliza o container principal */
+    text-align: center; /* Centraliza o texto */
+}
+
+.detalhes-passagem h2, .detalhes-passagem h3 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.tabela-trechos {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tabela-trechos th, .tabela-trechos td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center; /* Centraliza o conteúdo da célula */
+}
+
+.tabela-trechos th {
+    background-color: #f2f2f2;
+    color: #333;
 }

@@ -3,6 +3,7 @@ from flask import Flask, jsonify, request
 from prisma import Prisma, register
 import os, json
 import uuid
+from flask_cors import CORS
 
 from db_config import db
 from api.assentos import assentos_bp
@@ -15,6 +16,7 @@ from flask_jwt_extended import JWTManager
 
 
 app = Flask(__name__)
+CORS(app, origins="http://localhost:5050") # porta do front end
 
 secret_key = str(uuid.uuid4())
 app.config['JWT_SECRET_KEY'] = secret_key

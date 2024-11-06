@@ -17,9 +17,11 @@ def login():
     login = data.get('login')
     password = data.get('password')
 
-    if get_user(login, password):
+    user = get_user(login, password)
+    if user:
         access_token = create_access_token(identity=login)
-        return jsonify(access_token=access_token), 200
+
+        return jsonify(access_token=access_token, user_uuid=user.uuid), 200
     else:
         return jsonify({"message": "Credenciais inválidas"}), 401
 

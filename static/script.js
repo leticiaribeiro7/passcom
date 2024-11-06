@@ -13,9 +13,11 @@ document.getElementById('register-form').addEventListener('submit', async functi
         uuid: uuid
     };
 
+    const portaServidor = localStorage.getItem("portaServidor");
+
     try {
         // Faz a requisição POST para a API
-        const response = await fetch('/api/users/register', {
+        const response = await fetch(`http://localhost:${portaServidor}/register-all`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

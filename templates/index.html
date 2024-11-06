@@ -3,12 +3,39 @@
 <head>
     <title>PassCom!</title>
     <link rel="stylesheet" href="/static/style.css">
+    <script>
+        // Função para salvar o servidor no localStorage
+        function escolherServidor(porta) {
+            localStorage.setItem("portaServidor", porta);
+            document.getElementById("opcoesAcesso").style.display = "block";
+        }
+
+        // Função para redirecionar para Login ou Registrar
+        function acessarPagina(rota) {
+            const portaServidor = localStorage.getItem("portaServidor");
+            if (portaServidor) {
+                // Redireciona para a rota correta com a porta do servidor escolhida
+                window.location.href = `/${rota}`;
+            } else {
+                alert("Por favor, selecione um servidor primeiro.");
+            }
+        }
+    </script>
 </head>
 <body>
     <div class="container">
         <h1>Bem-vindo ao PassCom!</h1>
-        <a href="/login">Login</a>
-        <a href="/registrar">Registrar-se</a>
+        
+        <h2>Escolha o Servidor</h2>
+        <button onclick="escolherServidor(5000)">Companhia A</button>
+        <button onclick="escolherServidor(5001)">Companhia B</button>
+        <button onclick="escolherServidor(5002)">Companhia C</button>
+        
+        <div id="opcoesAcesso" style="display:none; margin-top: 20px;">
+            <h2>Escolha a Opção</h2>
+            <button onclick="acessarPagina('login')">Login</button>
+            <button onclick="acessarPagina('registrar')">Registrar-se</button>
+        </div>
     </div>
 </body>
 </html>

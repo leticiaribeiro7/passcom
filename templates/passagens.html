@@ -15,11 +15,14 @@
         <script>
             // Função para buscar passagens
             async function fetchPassagens() {
-                const userUuid = "SEU_USER_UUID_AQUI"; // Substitua pelo UUID do usuário atual
+                const userUuid = localStorage.getItem('user_uuid'); // Substitua pelo UUID do usuário atual
+                const token = localStorage.getItem('token');
+                const portaServidor = localStorage.getItem("portaServidor");
+
                 try {
-                    const response = await fetch(`/passagens-all/${userUuid}`, {
+                    const response = await fetch(`http://localhost:${portaServidor}/passagens-all/${userUuid}`, {
                         headers: {
-                            'Authorization': `Bearer SEU_TOKEN_JWT_AQUI` // Substitua pelo token JWT
+                            'Authorization': `Bearer ${token}` // Substitua pelo token JWT
                         }
                     });
                     const passagens = await response.json();
@@ -45,18 +48,35 @@
                     passagemDiv.classList.add("passagem");
 
                     const detalhes = `
-                        <p>Passagem UUID: ${passagem.uuid}</p>
-                        <p>Data de Criação: ${new Date(passagem.created_at).toLocaleString()}</p>
-                        <p>Trechos Reservados:</p>
-                        <ul>
-                            ${passagem.trechosReservados.map(trecho => `
-                                <li>
-                                    Origem: ${trecho.trecho.origem}, Destino: ${trecho.trecho.destino}, Companhia: ${trecho.trecho.company}, 
-                                    Assento: ${trecho.assento.numero}, Disponível: ${trecho.assento.disponivel ? "Sim" : "Não"}
-                                </li>
-                            `).join("")}
-                        </ul>
-                    `;
+                    <div class="detalhes-passagem">
+                        <h2>Detalhes da Passagem</h2>
+                        <p><strong>Identificador da Passagem:</strong> ${passagem.uuid}</p>
+                        <p><strong>Data de Criação:</strong> ${new Date(passagem.created_at).toLocaleString()}</p>
+                        
+                        <h3>Trechos Reservados:</h3>
+                        <table class="tabela-trechos">
+                            <thead>
+                                <tr>
+                                    <th>Origem</th>
+                                    <th>Destino</th>
+                                    <th>Companhia</th>
+                                    <th>Assento</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${passagem.trechosReservados.map(trecho => `
+                                    <tr>
+                                        <td>${trecho.trecho.origem}</td>
+                                        <td>${trecho.trecho.destino}</td>
+                                        <td>${trecho.trecho.company}</td>
+                                        <td>${trecho.assento.numero}</td>
+                                    </tr>
+                                `).join("")}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
 
                     passagemDiv.innerHTML = detalhes;
 
@@ -72,13 +92,16 @@
 
             // Função para cancelar uma passagem
             async function cancelarPassagem(uuid) {
-                const userUuid = "SEU_USER_UUID_AQUI"; // Substitua pelo UUID do usuário atual
+                const userUuid = localStorage.getItem('user_uuid'); // Substitua pelo UUID do usuário atual
+                const portaServidor = localStorage.getItem("portaServidor");
+                const token = localStorage.getItem('token');
+
                 if (confirm("Tem certeza de que deseja cancelar esta passagem?")) {
                     try {
-                        const response = await fetch(`/passagem-all/${userUuid}/${uuid}`, {
+                        const response = await fetch(`http://localhost:${portaServidor}/passagem-all/${userUuid}/${uuid}`, {
                             method: "DELETE",
                             headers: {
-                                'Authorization': `Bearer SEU_TOKEN_JWT_AQUI` // Substitua pelo token JWT
+                                'Authorization': `Bearer ${token}` // Substitua pelo token JWT
                             }
                         });
 

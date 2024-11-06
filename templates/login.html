@@ -83,12 +83,13 @@
         <script>
             document.getElementById('login-form').addEventListener('submit', async function(event) {
                 event.preventDefault();
+                const portaServidor = localStorage.getItem("portaServidor");
                 const login = document.getElementById('login').value;
                 const password = document.getElementById('password').value;
 
                 try {
                     // Faz a requisição de login
-                    const response = await fetch('/api/users/login', {
+                    const response = await fetch(`http://localhost:${portaServidor}/login`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -99,12 +100,13 @@
                     const result = await response.json();
 
                     if (response.ok) {
+                        console.log('ok')
                         // Armazena o token JWT no localStorage
                         localStorage.setItem('token', result.access_token);
-                        localStorage.setItem('user_uuid', result.uuid_user);
+                        localStorage.setItem('user_uuid', result.user_uuid);
 
                         // Redireciona o usuário para a página de opções
-                        window.location.href = "/opcoes.html";
+                        window.location.href = "/opcoes";
                     } else {
                         alert('Erro: ' + result.message);
                     }

@@ -19,8 +19,12 @@ def passagens():
     return render_template('passagens.html')
 
 @app.route('/rotas')
-def routes():
+def rotas():
     return render_template('rotas.html')
 
+@app.route('/opcoes')
+def opcoes():
+    return render_template('opcoes.html')
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5050)
+    app.run(host='0.0.0.0', port=5050, debug=True)

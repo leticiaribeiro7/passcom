@@ -140,7 +140,7 @@ def delete_passagem(user_uuid, uuid):
             response = requests.delete(f"{url}/passagem/{user_uuid}/{uuid}")
 
 
-        return response
+        return response.json()
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
